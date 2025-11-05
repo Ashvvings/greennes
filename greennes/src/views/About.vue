@@ -1,23 +1,29 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="about-page">
-    <h1>Qui sommes-nous ?</h1>
+  <section class="bg-dark" id="about">
+    <div class="about-page">
+      <h1>Qui sommes-nous ?</h1>
 
-    <div class="team-photo-wrapper">
-      <img src="../assets/images/Axelle.png" alt="Axelle" class="team-photo" />
-      <img src="../assets/images/Alice.png" alt="Alice" class="team-photo" />
+      <div class="team-photo-wrapper">
+        <img src="../assets/images/Axelle.png" alt="Axelle" class="team-photo" />
+        <img src="../assets/images/Alice.png" alt="Alice" class="team-photo" />
+      </div>
+
+      <div class="container">
+          <div class="section-content animate">
+            <p>
+                Nous sommes Axelle Briens-Solignac et Alice Lombard, étudiantes en 5ème année à l'INSA Rennes. <br />
+                Ce projet a été réalisé dans le cadre du cours d'IHM durant l'année universitaire 2025-2026.
+            </p>
+        </div>
+      </div>
+
+      <router-link to="/">
+        <button>Retour à la page d'accueil</button>
+      </router-link>
     </div>
-
-    <p>
-        Nous sommes Axelle Briens-Solignac et Alice Lombard, étudiantes en 5ème année à l'INSA de Rennes. <br />
-        Ce projet a été réalisé dans le cadre du cours d'IHM durant l'année universitaire 2025-2026.
-    </p>
-
-    <router-link to="/">
-      <button>Retour à la page d'accueil</button>
-    </router-link>
-  </div>
+  </section>
 </template>
 
 <style scoped>
