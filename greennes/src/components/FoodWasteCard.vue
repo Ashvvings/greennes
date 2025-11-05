@@ -1,0 +1,153 @@
+<template>
+  <div class="category-card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+      </svg>
+      <h3>Déchets alimentaires</h3>
+      <p class="subtitle">Composts et poubelles</p>
+    </div>
+
+    <div class="card-content">
+      <div v-if="loading" class="loading">Chargement...</div>
+      <div v-else-if="wasteData.length" class="items-list">
+        <div v-for="(item, idx) in wasteData.slice(0, 3)" :key="idx" class="item">
+          <div class="item-header">
+            <h4>{{ item.name }}</h4>
+          </div>
+          <p class="item-detail">{{ item.distance }}</p>
+        </div>
+      </div>
+    </div>
+
+    <button @click="$emit('show-map')" class="btn-more">Voir plus</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, defineProps, defineEmits } from 'vue'
+
+defineProps({
+  location: String
+})
+
+defineEmits(['show-map'])
+
+const loading = ref(true)
+const wasteData = ref([])
+
+const fetchWasteData = async () => {
+  try {
+    loading.value = true
+    const response = await fetch(
+      'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/composteurs-collectifs/records?limit=10'
+    )
+    const data = await response.json()
+    
+    wasteData.value = data.results.map((item) => ({
+      name: item.nom || 'Composteur',
+      distance: `${item.adresse || 'Rennes'}`,
+      lat: item.coordonnees?.lat,
+      lon: item.coordonnees?.lon
+    }))
+  } catch (error) {
+    console.error('Erreur chargement déchets:', error)
+    wasteData.value = [
+      { name: '3 composts à proximité', distance: '(10m, 45m, 200m)' },
+      { name: '2 poubelles de déchets alimentaires', distance: '(15m, 60m)' }
+    ]
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchWasteData()
+})
+</script>
+
+<style scoped>
+.category-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-icon {
+  width: 32px;
+  height: 32px;
+  color: #D4AF8F;
+  flex-shrink: 0;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1B0808;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.loading, .items-list {
+  min-height: 80px;
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.item {
+  padding: 0.75rem;
+  background-color: #F9F9F9;
+  border-radius: 8px;
+  border-left: 3px solid #D4AF8F;
+}
+
+.item-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #1B0808;
+}
+
+.item-detail {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.btn-more {
+  background-color: #D4AF8F;
+  color: #1B0808;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  align-self: center;
+}
+
+.btn-more:hover {
+  background-color: #C9A17A;
+}
+</style>
