@@ -91,6 +91,7 @@ const submitRating = () => {
   text-align: center;
   color: #666;
   margin-bottom: 2rem;
+  font-size: 0.95rem;
 }
 
 .form-container {
@@ -172,5 +173,71 @@ const submitRating = () => {
 
 .submit-btn:hover {
   background-color: #C9A17A;
+}
+
+/* Responsive design for tablets and mobile */
+@media (max-width: 768px) {
+  .rating-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .form-intro {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-container {
+    padding: 1.5rem;
+  }
+
+  .rating-form {
+    gap: 1rem;
+  }
+
+  .star {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .rating-section {
+    padding: 2rem 0;
+  }
+
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  .rating-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .form-intro {
+    font-size: 0.85rem;
+  }
+
+  .form-container {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+  }
+
+  .form-input {
+    font-size: 16px;
+    padding: 0.6rem;
+  }
+
+  .star {
+    font-size: 1.5rem;
+    gap: 0.25rem;
+  }
+
+  .submit-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
 }
 </style>

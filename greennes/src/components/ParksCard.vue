@@ -4,8 +4,10 @@
       <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
       </svg>
-      <h3>Parcs et jardins</h3>
-      <p class="subtitle">Emplacements et horaires</p>
+      <div class="header-content">
+        <h3>Parcs et jardins</h3>
+        <p class="subtitle">Emplacements et horaires</p>
+      </div>
     </div>
 
     <div class="card-content">
@@ -84,8 +86,12 @@ onMounted(() => {
 
 .card-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
+}
+
+.header-content {
+  flex: 1;
 }
 
 .card-icon {
@@ -124,6 +130,7 @@ onMounted(() => {
   border-radius: 8px;
   overflow: hidden;
   position: relative;
+  min-width: 0;
 }
 
 .carousel-slide {
@@ -171,6 +178,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s;
+  flex-shrink: 0;
 }
 
 .carousel-btn:hover {
@@ -191,5 +199,93 @@ onMounted(() => {
 
 .btn-more:hover {
   background-color: #C9A17A;
+}
+
+/* Responsive design for tablets and mobile */
+@media (max-width: 768px) {
+  .card-header {
+    align-items: center;
+  }
+
+  .carousel-wrapper {
+    gap: 0.5rem;
+  }
+
+  .carousel-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .carousel-container {
+    height: 150px;
+  }
+
+  .slide-info {
+    padding: 0.75rem;
+  }
+
+  .slide-info h4 {
+    font-size: 0.9rem;
+  }
+
+  .slide-info p {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .card-header {
+    gap: 0.75rem;
+  }
+
+  .card-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .card-header h3 {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .carousel-wrapper {
+    gap: 0.25rem;
+  }
+
+  .carousel-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .carousel-container {
+    height: 120px;
+  }
+
+  .slide-info {
+    padding: 0.5rem;
+  }
+
+  .slide-info h4 {
+    font-size: 0.8rem;
+  }
+
+  .slide-info p {
+    font-size: 0.7rem;
+  }
+
+  .btn-more {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
 }
 </style>

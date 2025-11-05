@@ -1,23 +1,12 @@
 <template>
   <div class="home-view">
-    <!-- Navigation -->
-    <nav class="navbar">
-      <div></div>
-      <div class="nav-center">
-        <a href="#home-cards" class="nav-link">Accueil</a>
-        <a href="#air-quality" class="nav-link">Qualité de l'air</a>
-        <a href="#comment" class="nav-link">Commentaires</a>
-        <router-link to="/about" class="nav-link">Qui sommes-nous ?</router-link>
-      </div>
-      <div></div>
-    </nav>
-
     <!-- Search Bar -->
     <SearchBar @location-selected="handleLocationSelected" />
 
     <!-- Main Content Section -->
     <section v-if="selectedLocation" class="main-content" id="home-cards">
       <div class="container">
+        <h2 class="section-title">Équipements à proximité</h2>
         <div class="cards-grid">
           <BikeCard :location="selectedLocation" @show-map="showBikeMap" />
           <FoodWasteCard :location="selectedLocation" @show-map="showWasteMap" />
@@ -86,71 +75,70 @@ const closeMapModal = () => {
   width: 100%;
 }
 
-.navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: #E8D5AA;
-  padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 999;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 2rem;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-center {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-}
-
-.nav-link {
-  color: #1B0808;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-  font-size: 0.95rem;
-}
-
-.nav-link:hover {
-  color: #0EA5A4;
-}
-
+/* Removed fixed navbar and improved spacing */
 .main-content {
   background-color: #FCF3DF;
-  padding: 2rem 0;
+  padding: 2rem 1rem;
 }
 
 .container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: #1B0808;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 600;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
 }
 
+/* Tablet responsive */
 @media (max-width: 768px) {
-  .navbar {
-    grid-template-columns: 1fr;
-    padding: 1rem;
+  .main-content {
+    padding: 1.5rem 0.75rem;
   }
 
-  .nav-center {
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
+  .section-title {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
   }
 
   .cards-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .container {
+    padding: 0 0.75rem;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 1rem 0.5rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .cards-grid {
+    gap: 1rem;
+  }
+
+  .container {
+    padding: 0 0.5rem;
   }
 }
 </style>

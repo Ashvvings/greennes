@@ -43,8 +43,7 @@ const performSearch = async () => {
 <style scoped>
 .search-section {
   background-color: #FCF3DF;
-  padding: 2rem 0;
-  margin-top: 5rem;
+  padding: 1.5rem 0;
 }
 
 .container {
@@ -78,6 +77,7 @@ const performSearch = async () => {
   height: 20px;
   color: #999;
   margin-right: 0.5rem;
+  flex-shrink: 0;
 }
 
 .search-input {
@@ -97,6 +97,8 @@ const performSearch = async () => {
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.3s;
+  white-space: nowrap;
+  font-size: 1rem;
 }
 
 .search-button:hover {
@@ -104,13 +106,90 @@ const performSearch = async () => {
 }
 
 .location-info {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   text-align: center;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #333;
 }
 
 .location-info strong {
   color: #1B0808;
+  font-weight: 600;
+}
+
+/* Improved tablet responsive adjustments */
+@media (max-width: 768px) {
+  .search-section {
+    padding: 1rem 0;
+  }
+
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  .search-container {
+    gap: 0.75rem;
+  }
+
+  .search-input-wrapper {
+    max-width: 100%;
+    font-size: 0.95rem;
+  }
+
+  .search-input {
+    font-size: 0.95rem;
+  }
+
+  .search-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .location-info {
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+  }
+}
+
+/* Improved mobile responsive adjustments */
+@media (max-width: 480px) {
+  .search-section {
+    padding: 0.75rem 0;
+  }
+
+  .container {
+    padding: 0 0.5rem;
+  }
+
+  .search-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .search-input-wrapper {
+    max-width: 100%;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .search-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.3rem;
+  }
+
+  .search-input {
+    font-size: 16px;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .location-info {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
 }
 </style>

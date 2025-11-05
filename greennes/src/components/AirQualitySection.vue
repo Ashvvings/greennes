@@ -217,39 +217,67 @@ onMounted(() => {
   font-size: 1.5rem;
 }
 
-.index-good {
-  background-color: #90EE90;
-  color: #1B0808;
-}
+.index-good { background-color: #90EE90; color: #1B0808; }
+.index-moderate { background-color: #FFFF99; color: #1B0808; }
+.index-unhealthy-sensitive { background-color: #FFB6C1; color: white; }
+.index-unhealthy { background-color: #FF6B6B; color: white; }
+.index-very-unhealthy { background-color: #9933FF; color: white; }
+.index-hazardous { background-color: #663300; color: white; }
 
-.index-moderate {
-  background-color: #FFFF99;
-  color: #1B0808;
-}
-
-.index-unhealthy-sensitive {
-  background-color: #FFB6C1;
-  color: white;
-}
-
-.index-unhealthy {
-  background-color: #FF6B6B;
-  color: white;
-}
-
-.index-very-unhealthy {
-  background-color: #9933FF;
-  color: white;
-}
-
-.index-hazardous {
-  background-color: #663300;
-  color: white;
-}
-
+/* Responsive design for tablets and mobile */
 @media (max-width: 768px) {
+  .air-quality-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
   .quality-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .quality-content {
+    padding: 1.5rem;
+  }
+
+  .index-badge {
+    width: 70px;
+    height: 70px;
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .air-quality-section {
+    padding: 2rem 0;
+  }
+
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  .air-quality-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .quality-content {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .label {
+    font-size: 0.8rem;
+  }
+
+  .value {
+    font-size: 0.9rem;
+  }
+
+  .index-badge {
+    width: 60px;
+    height: 60px;
+    font-size: 1rem;
   }
 }
 </style>
