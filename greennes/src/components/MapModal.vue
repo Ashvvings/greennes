@@ -6,7 +6,7 @@
         <button class="close-btn" @click="closeModal">✕</button>
       </div>
       
-      <div class="map-container" ref="mapContainer"></div>
+      <div class="map-container" ref="mapElement"></div>
       
       <div v-if="selectedItem" class="item-details">
         <h4>{{ selectedItem.name }}</h4>
@@ -18,35 +18,75 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineProps, defineEmits } from 'vue'
+import { ref, watch, defineProps, defineEmits, nextTick, onUnmounted } from 'vue'
+import L from 'leaflet'
 
-const props = defineProps({
-  isOpen: Boolean,
-  title: String,
-  items: Array
-})
+type Item = {
+  lat?: number
+  lon?: number
+  name?: string
+  hours?: string
+  available?: number
+}
+
+const props = defineProps<{
+  isOpen: boolean
+  title?: string
+  items?: Item[]
+}>()
 
 const emit = defineEmits(['close'])
 
-const mapContainer = ref(null)
-const selectedItem = ref(null)
+const mapElement = ref<HTMLDivElement | null>(null)
+const selectedItem = ref<Item | null>(null)
+let mapInstance: L.Map | null = null
 
 const closeModal = () => {
+  // clear selection when closing
+  selectedItem.value = null
   emit('close')
 }
 
-watch(() => props.isOpen, (newVal) => {
-  if (newVal && mapContainer.value) {
-    // Leaflet map will be initialized here
-    setTimeout(() => {
-      if (window.L) {
-        const map = window.L.map(mapContainer.value).setView([48.1173, -1.6778], 13)
-        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors',
-          maxZoom: 19
-        }).addTo(map)
+const initializeMap = () => {
+  if (!mapElement.value) return
+
+  if (mapInstance) {
+    mapInstance.remove()
+  }
+
+  mapInstance = L.map(mapElement.value).setView([48.1173, -1.6778], 13)
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19
+  }).addTo(mapInstance)
+
+  // Add markers for items if provided
+  if (props.items && Array.isArray(props.items)) {
+    props.items.forEach((item: Item) => {
+      if (typeof item.lat === 'number' && typeof item.lon === 'number') {
+        L.marker([item.lat, item.lon])
+          .bindPopup(`<strong>${item.name ?? ''}</strong>`)
+          .addTo(mapInstance as L.Map)
+          .on('click', () => {
+            selectedItem.value = item
+          })
       }
-    }, 100)
+    })
+  }
+}
+
+// Initialize map when modal opens. Use nextTick to ensure DOM is ready.
+watch(() => props.isOpen, (newVal: boolean) => {
+  if (newVal) {
+    nextTick(() => initializeMap())
+  }
+})
+
+onUnmounted(() => {
+  if (mapInstance) {
+    mapInstance.remove()
+    mapInstance = null
   }
 })
 </script>
