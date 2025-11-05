@@ -142,21 +142,26 @@ const submitRating = () => {
 }
 
 .star {
-  background: none;
-  border: none;
+  background: white;
+  border: 2px solid #D4AF8F;
   font-size: 2rem;
   cursor: pointer;
   color: #D4AF8F;
-  transition: color 0.2s;
-  padding: 0;
+  transition: all 0.2s;
+  padding: 0.25rem;
+  border-radius: 4px;
 }
 
 .star.filled {
-  color: #FFC107;
+  background-color: #FFC107;
+  color: white;
+  border-color: #FFC107;
 }
 
 .star:hover {
-  color: #FFC107;
+  background-color: #FFC107;
+  color: white;
+  border-color: #FFC107;
 }
 
 .submit-btn {

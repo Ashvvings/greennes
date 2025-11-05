@@ -11,15 +11,33 @@
             <h3>Données météorologiques</h3>
             <div class="data-rows">
               <div class="data-row">
-                <span class="label">température :</span>
+                <div class="label-with-info">
+                  <span class="label">température :</span>
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Température actuelle de l'air en degrés Celsius</div>
+                  </div>
+                </div>
                 <span class="value">{{ airData.temperature }} °C</span>
               </div>
               <div class="data-row">
-                <span class="label">humidité relative :</span>
+                <div class="label-with-info">
+                  <span class="label">humidité relative :</span>
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Pourcentage d'humidité dans l'air</div>
+                  </div>
+                </div>
                 <span class="value">{{ airData.humidity }} %</span>
               </div>
               <div class="data-row">
-                <span class="label">pression atmosphérique :</span>
+                <div class="label-with-info">
+                  <span class="label">pression atmosphérique :</span>
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Pression de l'air en hectopascals</div>
+                  </div>
+                </div>
                 <span class="value">{{ airData.pressure }} hPa</span>
               </div>
             </div>
@@ -29,26 +47,56 @@
             <h3>Particules atmosphériques</h3>
             <div class="data-rows">
               <div class="data-row">
-                <span class="label">pm2.5° :</span>
+                <div class="label-with-info">
+                  <span class="label">pm2.5° :</span>
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Particules fines ≤ 2.5 μm (très dangereuses)</div>
+                  </div>
+                </div>
                 <span class="value">{{ airData.pm25 }} μg/m³</span>
               </div>
               <div class="data-row">
-                <span class="label">pm10° :</span>
+                <div class="label-with-info">
+                  <span class="label">pm10° :</span>
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Particules ≤ 10 μm (inhalables)</div>
+                  </div>
+                </div>
                 <span class="value">{{ airData.pm10 }} μg/m³</span>
               </div>
               <div class="data-row">
-                <span class="label">o3 :</span>
+                <div class="label-with-info">
+                  <span class="label">o3 :</span>
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Ozone troposphérique (polluant secondaire)</div>
+                  </div>
+                </div>
                 <span class="value">{{ airData.o3 }} μg/m³</span>
               </div>
               <div class="data-row">
-                <span class="label">no2 :</span>
+                <div class="label-with-info">
+                  <span class="label">no2 :</span>
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Dioxyde d'azote (polluant du trafic)</div>
+                  </div>
+                </div>
                 <span class="value">{{ airData.no2 }} μg/m³</span>
               </div>
             </div>
           </div>
 
           <div class="quality-index">
-            <div class="index-label">Indice global</div>
+            <div class="index-label-with-info">
+              <span>Indice global</span>
+              <div class="info-tooltip">
+                <span class="info-icon">ℹ</span>
+                <div class="tooltip-text">Indice de qualité de l'air global (0-500). Plus faible = meilleur</div>
+              </div>
+            </div>
             <div :class="['index-badge', `index-${airData.indexLevel}`]">
               {{ airData.index }}
             </div>
@@ -223,6 +271,78 @@ onMounted(() => {
 .index-unhealthy { background-color: #FF6B6B; color: white; }
 .index-very-unhealthy { background-color: #9933FF; color: white; }
 .index-hazardous { background-color: #663300; color: white; }
+
+.label-with-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.index-label-with-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: #1B0808;
+  font-weight: 600;
+}
+
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #D4AF8F;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #D4AF8F;
+  cursor: help;
+  flex-shrink: 0;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: #1B0808;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  font-size: 0.8rem;
+  white-space: normal;
+  line-height: 1.4;
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1B0808;
+}
+
+.info-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
 
 /* Responsive design for tablets and mobile */
 @media (max-width: 768px) {

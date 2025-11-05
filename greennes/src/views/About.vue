@@ -14,6 +14,7 @@
 
       <section class="team-section">
         <h2>Notre équipe</h2>
+        <!-- Updated team to only show 2 members -->
         <div class="team-grid">
           <div class="team-member">
             <div class="member-avatar">👤</div>
@@ -27,20 +28,6 @@
             <h3>Membre 2</h3>
             <p class="member-role">Développeur Backend</p>
             <p class="member-bio">Spécialiste des APIs et de l'intégration de données</p>
-          </div>
-
-          <div class="team-member">
-            <div class="member-avatar">👤</div>
-            <h3>Membre 3</h3>
-            <p class="member-role">Designer UX/UI</p>
-            <p class="member-bio">Créateur de l'interface et de l'expérience utilisateur</p>
-          </div>
-
-          <div class="team-member">
-            <div class="member-avatar">👤</div>
-            <h3>Membre 4</h3>
-            <p class="member-role">Responsable Projet</p>
-            <p class="member-bio">Coordination et gestion du projet global</p>
           </div>
         </div>
       </section>
