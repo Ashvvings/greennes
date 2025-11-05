@@ -1,11 +1,7 @@
 <template>
   <div class="category-card">
     <div class="card-header">
-      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="18" cy="17" r="3"></circle>
-        <circle cx="6" cy="17" r="3"></circle>
-        <path d="M4 6h16M4 12h16"></path>
-      </svg>
+      <img src="@/assets/icons/velo.png" alt="Bike Icon" class="card-icon" />
       <h3>Vélos</h3>
       <p class="subtitle">Location et stationnement</p>
     </div>
@@ -58,7 +54,7 @@ const fetchBikeData = async () => {
     )
     const data = await response.json()
     
-    bikeData.value = data.results.map((station) => ({
+    bikeData.value = data.results.map((station: { nom_station: any; nombrevelosdisponibles: any; nombreemplacementsdisponibles: any; coordonnees: { lat: any; lon: any } }) => ({
       name: station.nom_station,
       type: 'station',
       available: station.nombrevelosdisponibles,
@@ -68,11 +64,6 @@ const fetchBikeData = async () => {
     }))
   } catch (error) {
     console.error('Erreur chargement vélos:', error)
-    bikeData.value = [
-      { name: 'Station Sainte-Anne', type: 'station', available: 13, capacity: 13 },
-      { name: 'Station Hoche', type: 'station', available: 13, capacity: 13 },
-      { name: 'Parking Hoche', type: 'parking', available: 13 }
-    ]
   } finally {
     loading.value = false
   }
