@@ -8,9 +8,25 @@
       <div class="container">
         <h2 class="section-title">Équipements à proximité</h2>
         <div class="cards-grid">
-          <BikeCard :location="selectedLocation" @show-map="showBikeMap" />
-          <FoodWasteCard :location="selectedLocation" @show-map="showWasteMap" />
-          <ParksCard :location="selectedLocation" @show-map="showParksMap" />
+          <!-- Pass correct props to all cards -->
+          <BikeCard 
+            :location="selectedLocation.name" 
+            :user-lat="selectedLocation.lat"
+            :user-lon="selectedLocation.lon"
+            @show-map="showBikeMap" 
+          />
+          <FoodWasteCard 
+            :location="selectedLocation.name" 
+            :user-lat="selectedLocation.lat"
+            :user-lon="selectedLocation.lon"
+            @show-map="showWasteMap" 
+          />
+          <ParksCard 
+            :location="selectedLocation.name" 
+            :user-lat="selectedLocation.lat"
+            :user-lon="selectedLocation.lon"
+            @show-map="showParksMap" 
+          />
         </div>
       </div>
     </section>
@@ -22,10 +38,13 @@
     <RatingForm />
 
     <!-- Map Modal -->
+    <!-- Pass correct props including isOpen -->
     <MapModal
-      :isOpen="showMap"
+      :is-open="showMap"
       :title="mapTitle"
       :items="mapItems"
+      :user-lat="selectedLocation?.lat"
+      :user-lon="selectedLocation?.lon"
       @close="closeMapModal"
     />
   </div>
@@ -41,12 +60,18 @@ import AirQualitySection from '../components/AirQualitySection.vue'
 import RatingForm from '../components/RatingForm.vue'
 import MapModal from '../components/MapModal.vue'
 
-const selectedLocation = ref('')
+interface LocationData {
+  name: string
+  lat: number
+  lon: number
+}
+
+const selectedLocation = ref<LocationData | null>(null)
 const showMap = ref(false)
 const mapTitle = ref('')
 const mapItems = ref([])
 
-const handleLocationSelected = (location: string) => {
+const handleLocationSelected = (location: LocationData) => {
   selectedLocation.value = location
 }
 
@@ -75,7 +100,6 @@ const closeMapModal = () => {
   width: 100%;
 }
 
-/* Removed fixed navbar and improved spacing */
 .main-content {
   background-color: #FCF3DF;
   padding: 2rem 1rem;
@@ -101,7 +125,6 @@ const closeMapModal = () => {
   gap: 2rem;
 }
 
-/* Tablet responsive */
 @media (max-width: 768px) {
   .main-content {
     padding: 1.5rem 0.75rem;
@@ -122,7 +145,6 @@ const closeMapModal = () => {
   }
 }
 
-/* Mobile responsive */
 @media (max-width: 480px) {
   .main-content {
     padding: 1rem 0.5rem;

@@ -10,12 +10,16 @@
 
     <div class="card-content">
       <div v-if="loading" class="loading">Chargement...</div>
-      <div v-else-if="wasteData.length" class="items-list">
-        <div v-for="(item, idx) in wasteData.slice(0, 3)" :key="idx" class="item">
+      <div v-else-if="sortedWasteData.length" class="items-list">
+        <!-- display sorted items with distance -->
+        <div v-for="(item, idx) in sortedWasteData.slice(0, 3)" :key="idx" class="item">
           <div class="item-header">
             <h4>{{ item.name }}</h4>
           </div>
-          <p class="item-detail">{{ item.distance }}</p>
+          <p class="item-detail">
+            {{ item.distance }}<br/>
+            <span class="distance" v-if="item.formattedDistance">{{ item.formattedDistance }}</span>
+          </p>
         </div>
       </div>
     </div>
@@ -25,16 +29,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineProps, defineEmits } from 'vue'
+import { ref, onMounted, defineProps, defineEmits, computed } from 'vue'
+import { calculateDistance, formatDistance } from '../utils/geoLocation'
 
-defineProps({
-  location: String
+interface WasteItem {
+  name: string
+  distance: string
+  lat: number
+  lon: number
+  formattedDistance?: string
+}
+
+const props = defineProps({
+  location: String,
+  userLat: Number,
+  userLon: Number
 })
 
-defineEmits(['show-map'])
+const emit = defineEmits(['show-map'])
 
 const loading = ref(true)
-const wasteData = ref([])
+const wasteData = ref<WasteItem[]>([])
+
+const sortedWasteData = computed(() => {
+  if (!props.userLat || !props.userLon) return wasteData.value
+
+  return [...wasteData.value]
+    .map((item) => ({
+      ...item,
+      formattedDistance: formatDistance(
+        calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon)
+      )
+    }))
+    .sort((a, b) => {
+      const distA = calculateDistance(props.userLat!, props.userLon!, a.lat, a.lon)
+      const distB = calculateDistance(props.userLat!, props.userLon!, b.lat, b.lon)
+      return distA - distB
+    })
+})
 
 const fetchWasteData = async () => {
   try {
@@ -44,17 +76,17 @@ const fetchWasteData = async () => {
     )
     const data = await response.json()
     
-    wasteData.value = data.results.map((item) => ({
+    wasteData.value = data.results.map((item: any) => ({
       name: item.nom || 'Composteur',
-      distance: `${item.adresse || 'Rennes'}`,
+      distance: item.adresse || 'Rennes',
       lat: item.coordonnees?.lat,
       lon: item.coordonnees?.lon
     }))
   } catch (error) {
     console.error('Erreur chargement déchets:', error)
     wasteData.value = [
-      { name: '3 composts à proximité', distance: '(10m, 45m, 200m)' },
-      { name: '2 poubelles de déchets alimentaires', distance: '(15m, 60m)' }
+      { name: '3 composts à proximité', distance: '(10m, 45m, 200m)', lat: 48.1173, lon: -1.6778 },
+      { name: '2 poubelles de déchets alimentaires', distance: '(15m, 60m)', lat: 48.1180, lon: -1.6800 }
     ]
   } finally {
     loading.value = false
@@ -135,6 +167,11 @@ onMounted(() => {
   color: #666;
 }
 
+.distance {
+  color: #0EA5A4;
+  font-weight: 600;
+}
+
 .btn-more {
   background-color: #D4AF8F;
   color: #1B0808;
@@ -149,5 +186,40 @@ onMounted(() => {
 
 .btn-more:hover {
   background-color: #C9A17A;
+}
+
+@media (max-width: 768px) {
+  .category-card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    gap: 0.75rem;
+  }
+
+  .card-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .card-header h3 {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-card {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .btn-more {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
 }
 </style>

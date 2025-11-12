@@ -12,8 +12,9 @@
 
     <div class="card-content">
       <div v-if="loading" class="loading">Chargement...</div>
-      <div v-else-if="bikeData.length" class="items-list">
-        <div v-for="(item, idx) in bikeData.slice(0, 3)" :key="idx" class="item">
+      <div v-else-if="sortedBikeData.length" class="items-list">
+        <!-- display sorted items with distance -->
+        <div v-for="(item, idx) in sortedBikeData.slice(0, 3)" :key="idx" class="item">
           <div class="item-header">
             <svg v-if="item.type === 'station'" class="item-icon" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="12" cy="12" r="9"></circle>
@@ -25,10 +26,12 @@
           </div>
           <p class="item-detail" v-if="item.type === 'station'">
             disponibles : {{ item.available }}<br/>
-            emplacements : {{ item.capacity }}
+            emplacements : {{ item.capacity }}<br/>
+            <span class="distance">{{ item.formattedDistance }}</span>
           </p>
           <p class="item-detail" v-else>
-            disponibles : {{ item.available }}
+            disponibles : {{ item.available }}<br/>
+            <span class="distance">{{ item.formattedDistance }}</span>
           </p>
         </div>
       </div>
@@ -39,16 +42,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineProps, defineEmits } from 'vue'
+import { ref, onMounted, defineProps, defineEmits, computed } from 'vue'
+import { calculateDistance, formatDistance } from '../utils/geoLocation'
 
-defineProps({
-  location: String
+interface BikeItem {
+  name: string
+  type: 'station' | 'parking'
+  available: number
+  capacity?: number
+  lat: number
+  lon: number
+  distance?: number
+  formattedDistance?: string
+}
+
+const props = defineProps({
+  location: String,
+  userLat: Number,
+  userLon: Number
 })
 
-defineEmits(['show-map'])
+const emit = defineEmits(['show-map'])
 
 const loading = ref(true)
-const bikeData = ref([])
+const bikeData = ref<BikeItem[]>([])
+
+const sortedBikeData = computed(() => {
+  if (!props.userLat || !props.userLon) return bikeData.value
+
+  return [...bikeData.value]
+    .map((item) => ({
+      ...item,
+      distance: calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon),
+      formattedDistance: formatDistance(
+        calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon)
+      )
+    }))
+    .sort((a, b) => (a.distance || 0) - (b.distance || 0))
+})
 
 const fetchBikeData = async () => {
   try {
@@ -58,7 +89,7 @@ const fetchBikeData = async () => {
     )
     const data = await response.json()
     
-    bikeData.value = data.results.map((station) => ({
+    bikeData.value = data.results.map((station: any) => ({
       name: station.nom_station,
       type: 'station',
       available: station.nombrevelosdisponibles,
@@ -69,9 +100,9 @@ const fetchBikeData = async () => {
   } catch (error) {
     console.error('Erreur chargement vélos:', error)
     bikeData.value = [
-      { name: 'Station Sainte-Anne', type: 'station', available: 13, capacity: 13 },
-      { name: 'Station Hoche', type: 'station', available: 13, capacity: 13 },
-      { name: 'Parking Hoche', type: 'parking', available: 13 }
+      { name: 'Station Sainte-Anne', type: 'station', available: 13, capacity: 13, lat: 48.1123, lon: -1.6789 },
+      { name: 'Station Hoche', type: 'station', available: 13, capacity: 13, lat: 48.1145, lon: -1.6756 },
+      { name: 'Parking Hoche', type: 'parking', available: 13, lat: 48.1140, lon: -1.6750, capacity: 0 }
     ]
   } finally {
     loading.value = false
@@ -165,6 +196,11 @@ onMounted(() => {
   color: #666;
 }
 
+.distance {
+  color: #0EA5A4;
+  font-weight: 600;
+}
+
 .btn-more {
   background-color: #D4AF8F;
   color: #1B0808;
@@ -179,5 +215,40 @@ onMounted(() => {
 
 .btn-more:hover {
   background-color: #C9A17A;
+}
+
+@media (max-width: 768px) {
+  .category-card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    gap: 0.75rem;
+  }
+
+  .card-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .card-header h3 {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-card {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .btn-more {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
 }
 </style>

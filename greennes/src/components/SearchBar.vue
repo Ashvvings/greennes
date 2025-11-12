@@ -12,8 +12,26 @@
             type="text"
             placeholder="Rechercher un lieu"
             class="search-input"
-            @keyup.enter="performSearch"
+            @keyup.enter="selectSuggestion(searchQuery)"
+            @input="fetchSuggestions"
+            @focus="showSuggestions = true"
+            @blur="hideSuggestions"
+            autocomplete="off"
           />
+          <!-- Autocomplete suggestions dropdown -->
+          <div v-if="showSuggestions && suggestions.length > 0" class="suggestions-dropdown">
+            <button
+              v-for="(suggestion, idx) in suggestions"
+              :key="idx"
+              class="suggestion-item"
+              @click="selectSuggestion(suggestion)"
+            >
+              <svg class="location-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+              </svg>
+              <span>{{ suggestion }}</span>
+            </button>
+          </div>
         </div>
         <button @click="performSearch" class="search-button">Rechercher</button>
       </div>
@@ -30,12 +48,61 @@ import { ref, defineEmits } from 'vue'
 
 const searchQuery = ref('')
 const selectedLocation = ref('')
+const suggestions = ref<string[]>([])
+const showSuggestions = ref(false)
 const emit = defineEmits(['location-selected'])
+
+const hideSuggestions = () => {
+  window.setTimeout(() => {
+    showSuggestions.value = false
+  }, 200)
+}
+
+const fetchSuggestions = async () => {
+  if (searchQuery.value.length < 2) {
+    suggestions.value = []
+    return
+  }
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value)}&limit=5&countrycodes=fr`
+    )
+    const data = await response.json()
+    suggestions.value = data.map((item: any) => item.display_name).slice(0, 5)
+  } catch (error) {
+    console.error('Erreur chargement suggestions:', error)
+    suggestions.value = []
+  }
+}
+
+const selectSuggestion = async (query: string) => {
+  searchQuery.value = query
+  showSuggestions.value = false
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=fr`
+    )
+    const data = await response.json()
+    
+    if (data.length > 0) {
+      const result = data[0]
+      selectedLocation.value = query
+      emit('location-selected', {
+        name: query,
+        lat: parseFloat(result.lat),
+        lon: parseFloat(result.lon)
+      })
+    }
+  } catch (error) {
+    console.error('Erreur géocodage:', error)
+  }
+}
 
 const performSearch = async () => {
   if (searchQuery.value.trim()) {
-    selectedLocation.value = searchQuery.value
-    emit('location-selected', searchQuery.value)
+    await selectSuggestion(searchQuery.value)
   }
 }
 </script>
@@ -70,6 +137,7 @@ const performSearch = async () => {
   flex: 1;
   max-width: 500px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .search-icon {
@@ -86,6 +154,47 @@ const performSearch = async () => {
   width: 100%;
   font-size: 1rem;
   font-family: 'Inter', sans-serif;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #E0E0E0;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.suggestion-item:hover {
+  background-color: #F5F5F5;
+}
+
+.location-icon {
+  width: 16px;
+  height: 16px;
+  color: #D4AF8F;
+  flex-shrink: 0;
 }
 
 .search-button {
@@ -117,7 +226,6 @@ const performSearch = async () => {
   font-weight: 600;
 }
 
-/* Improved tablet responsive adjustments */
 @media (max-width: 768px) {
   .search-section {
     padding: 1rem 0;
@@ -151,7 +259,6 @@ const performSearch = async () => {
   }
 }
 
-/* Improved mobile responsive adjustments */
 @media (max-width: 480px) {
   .search-section {
     padding: 0.75rem 0;

@@ -19,7 +19,8 @@
             <img :src="parks[currentSlide].image" :alt="parks[currentSlide].name" />
             <div class="slide-info">
               <h4>{{ parks[currentSlide].name }}</h4>
-              <p>{{ parks[currentSlide].distance }}</p>
+              <!-- display calculated distance for current slide -->
+              <p>{{ parks[currentSlide].formattedDistance || parks[currentSlide].distance }}</p>
             </div>
           </div>
         </div>
@@ -33,30 +34,48 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineProps, defineEmits } from 'vue'
+import { ref, onMounted, defineProps, defineEmits, watch } from 'vue'
+import { calculateDistance, formatDistance } from '../utils/geoLocation'
 
-defineProps({
-  location: String
+interface Park {
+  name: string
+  distance: string
+  image: string
+  lat?: number
+  lon?: number
+  formattedDistance?: string
+}
+
+const props = defineProps({
+  location: String,
+  userLat: Number,
+  userLon: Number
 })
 
-defineEmits(['show-map'])
+const emit = defineEmits(['show-map'])
 
 const currentSlide = ref(0)
-const parks = ref([
+const parks = ref<Park[]>([
   {
     name: 'Étang des Longs Champs',
     distance: '200m',
-    image: '/placeholder.svg?height=200&width=300'
+    image: '/placeholder.svg?height=200&width=300',
+    lat: 48.1245,
+    lon: -1.6890
   },
   {
     name: 'Parc des Gayeulles',
     distance: '500m',
-    image: '/placeholder.svg?height=200&width=300'
+    image: '/placeholder.svg?height=200&width=300',
+    lat: 48.1156,
+    lon: -1.6834
   },
   {
     name: 'Parc de la Préfecture',
     distance: '450m',
-    image: '/placeholder.svg?height=200&width=300'
+    image: '/placeholder.svg?height=200&width=300',
+    lat: 48.1102,
+    lon: -1.6745
   }
 ])
 
@@ -68,8 +87,19 @@ const prevSlide = () => {
   currentSlide.value = (currentSlide.value - 1 + parks.value.length) % parks.value.length
 }
 
+watch(() => [props.userLat, props.userLon], () => {
+  if (props.userLat && props.userLon) {
+    parks.value = parks.value.map(park => ({
+      ...park,
+      formattedDistance: park.lat && park.lon 
+        ? formatDistance(calculateDistance(props.userLat!, props.userLon!, park.lat, park.lon))
+        : park.distance
+    }))
+  }
+}, { immediate: true })
+
 onMounted(() => {
-  // Charger les données des parcs depuis l'API
+  // Load parks data from API if needed
 })
 </script>
 
@@ -201,7 +231,6 @@ onMounted(() => {
   background-color: #C9A17A;
 }
 
-/* Responsive design for tablets and mobile */
 @media (max-width: 768px) {
   .card-header {
     align-items: center;
