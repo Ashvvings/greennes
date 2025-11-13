@@ -1,32 +1,16 @@
 <template>
   <div class="home-view">
+
     <!-- Search Bar -->
     <SearchBar @location-selected="handleLocationSelected" />
 
     <!-- Main Content Section -->
     <section v-if="selectedLocation" class="main-content" id="home-cards">
       <div class="container">
-        <h2 class="section-title">Équipements à proximité</h2>
         <div class="cards-grid">
-          <!-- Pass correct props to all cards -->
-          <BikeCard 
-            :location="selectedLocation.name" 
-            :user-lat="selectedLocation.lat"
-            :user-lon="selectedLocation.lon"
-            @show-map="showBikeMap" 
-          />
-          <FoodWasteCard 
-            :location="selectedLocation.name" 
-            :user-lat="selectedLocation.lat"
-            :user-lon="selectedLocation.lon"
-            @show-map="showWasteMap" 
-          />
-          <ParksCard 
-            :location="selectedLocation.name" 
-            :user-lat="selectedLocation.lat"
-            :user-lon="selectedLocation.lon"
-            @show-map="showParksMap" 
-          />
+          <BikeCard :location="selectedLocation" @show-map="showBikeMap" />
+          <FoodWasteCard :location="selectedLocation" @show-map="showWasteMap" />
+          <ParksCard :location="selectedLocation" @show-map="showParksMap" />
         </div>
       </div>
     </section>
@@ -38,13 +22,10 @@
     <RatingForm />
 
     <!-- Map Modal -->
-    <!-- Pass correct props including isOpen -->
     <MapModal
-      :is-open="showMap"
+      :isOpen="showMap"
       :title="mapTitle"
       :items="mapItems"
-      :user-lat="selectedLocation?.lat"
-      :user-lon="selectedLocation?.lon"
       @close="closeMapModal"
     />
   </div>
@@ -60,18 +41,12 @@ import AirQualitySection from '../components/AirQualitySection.vue'
 import RatingForm from '../components/RatingForm.vue'
 import MapModal from '../components/MapModal.vue'
 
-interface LocationData {
-  name: string
-  lat: number
-  lon: number
-}
-
-const selectedLocation = ref<LocationData | null>(null)
+const selectedLocation = ref('')
 const showMap = ref(false)
 const mapTitle = ref('')
 const mapItems = ref([])
 
-const handleLocationSelected = (location: LocationData) => {
+const handleLocationSelected = (location: string) => {
   selectedLocation.value = location
 }
 
@@ -100,67 +75,71 @@ const closeMapModal = () => {
   width: 100%;
 }
 
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #E8D5AA;
+  padding: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-center {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.nav-link {
+  color: #1B0808;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+  font-size: 0.95rem;
+}
+
+.nav-link:hover {
+  color: #0EA5A4;
+}
+
 .main-content {
   background-color: #FCF3DF;
-  padding: 2rem 1rem;
+  padding: 2rem 0;
 }
 
 .container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.section-title {
-  font-size: 1.8rem;
-  color: #1B0808;
-  margin-bottom: 2rem;
-  text-align: center;
-  font-weight: 600;
+  padding: 0 1rem;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
 }
 
 @media (max-width: 768px) {
-  .main-content {
-    padding: 1.5rem 0.75rem;
+  .navbar {
+    grid-template-columns: 1fr;
+    padding: 1rem;
   }
 
-  .section-title {
-    font-size: 1.4rem;
-    margin-bottom: 1.5rem;
+  .nav-center {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
   }
 
   .cards-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .container {
-    padding: 0 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .main-content {
-    padding: 1rem 0.5rem;
-  }
-
-  .section-title {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-  }
-
-  .cards-grid {
-    gap: 1rem;
-  }
-
-  .container {
-    padding: 0 0.5rem;
   }
 }
 </style>

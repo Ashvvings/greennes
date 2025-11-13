@@ -2,33 +2,59 @@
   <div class="about-view">
     <div class="about-container">
       <h1>Qui sommes-nous ?</h1>
-      
+
       <section class="intro-section">
-        <h2>À propos du projet Rennes Location</h2>
+        <h2>À propos du projet Greennes</h2>
         <p>
-          Rennes Location est une application collaborative conçue pour aider les habitants de Rennes 
-          à découvrir les équipements et services durables près de leur position : vélos en libre-service, 
-          espaces verts, composts communitaires, et bien plus.
+          Greennes est une application collaborative conçue pour aider les habitant·e·s de Rennes
+          à découvrir les équipements et services durables près de leur position : vélos en libre-service,
+          espaces verts, et composts communautaires, tout cela à portée de main via une interface intuitive.
+          En plus de fournir des informations précises et à jour, Greennes vise à encourager un mode de vie plus
+          écologique
+          et responsable au sein de la communauté rennaise.
         </p>
       </section>
 
       <section class="team-section">
         <h2>Notre équipe</h2>
-        <!-- Updated team to only show 2 members -->
         <div class="team-grid">
-          <div class="team-member">
-            <div class="member-avatar">👤</div>
-            <h3>Membre 1</h3>
-            <p class="member-role">Développeur Frontend</p>
-            <p class="member-bio">Passionné par Vue.js et les interfaces utilisateur</p>
-          </div>
+          <a href="https://www.linkedin.com/in/alice-caroline-lombard" target="_blank">
+            <div class="team-member">
+              <img src="../assets/images/alice.png" alt="Image Alice Lombard">
+              <container class="name">
+                <h3>Alice Lombard</h3>
+              </container>
+              <p class="member-role">Développeuse Fullstack</p>
+              <p class="member-bio">Étudiante à l'INSA Rennes</p>
+            </div>
+          </a>
 
-          <div class="team-member">
-            <div class="member-avatar">👤</div>
-            <h3>Membre 2</h3>
-            <p class="member-role">Développeur Backend</p>
-            <p class="member-bio">Spécialiste des APIs et de l'intégration de données</p>
-          </div>
+          <a href="https://www.linkedin.com/in/axelle-briens-solignac-b84836220/" target="_blank">
+            <div class="team-member">
+              <img src="../assets/images/axelle.png" alt="Image Axelle Briens-Solignac">
+              <h3>Axelle Briens-Solignac</h3>
+              <p class="member-role">Développeuse Fullstack</p>
+              <p class="member-bio">Étudiante à l'INSA Rennes</p>
+            </div>
+          </a>
+
+          <a href="https://www.linkedin.com/in/maud-marchal-bb837b4/" target="_blank">
+            <div class="team-member">
+              <img src="../assets/images/maud.png" alt="Image Maud Marchal">
+              <h3>Maud Marchal</h3>
+              <p class="member-role">Encadrante de projet</p>
+              <p class="member-bio">Enseignante chercheuse à l'INSA Rennes</p>
+            </div>
+          </a>
+
+          <a href="https://www.linkedin.com/in/nicolo-cavalli/" target="_blank">
+            <div class="team-member">
+              <img src="../assets/images/nicolo.png" alt="Image Nicolo Cavalli">
+              <h3>Nicolo Cavalli</h3>
+              <p class="member-role">Encadrant de projet</p>
+              <p class="member-bio">Doctorant à l'INRIA et intervenant à l'INSA Rennes</p>
+            </div>
+          </a>
         </div>
       </section>
 
@@ -41,7 +67,7 @@
           </div>
           <div class="value-item">
             <h4>🤝 Accessibilité</h4>
-            <p>Rendre l'information accessible à tous les habitants</p>
+            <p>Rendre l'information accessible à tou·te·s les Rennais·e·s</p>
           </div>
           <div class="value-item">
             <h4>🗺️ Localisation</h4>
@@ -60,7 +86,6 @@
 </template>
 
 <script setup lang="ts">
-// About page component
 </script>
 
 <style scoped>
@@ -125,18 +150,32 @@ p {
 
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
   margin-top: 1.5rem;
+}
+
+.team-grid a {
+  display: grid;
+  text-decoration: none;
+  color: inherit;
+}
+
+.team-grid a:hover,
+.team-grid a:focus,
+.team-grid a:active {
+  text-decoration: none;
+  outline: none;
 }
 
 .team-member {
   background-color: white;
-  padding: 1.5rem;
+  padding: 1rem;
   border-radius: 12px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
 }
 
 .team-member:hover {
@@ -144,9 +183,20 @@ p {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
-.member-avatar {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+.team-member img {
+  height: 120px;
+  width: 120px;
+  display: block;
+  margin: 0 auto 1rem auto;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.name {
+  border-color: #1B0808;
+  border-radius: 2%;
+  color: #1B0808;
+  margin: 0.5rem 0;
 }
 
 .member-role {
@@ -166,7 +216,7 @@ p {
 
 .values-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
@@ -184,7 +234,9 @@ p {
 }
 
 .btn-home {
-  display: inline-block;
+  display: block;
+  width: fit-content;
+  margin: 2rem auto 0;
   background-color: #D4AF8F;
   color: #1B0808;
   padding: 0.75rem 1.5rem;
@@ -192,9 +244,9 @@ p {
   text-decoration: none;
   font-weight: 500;
   transition: background-color 0.3s;
-  margin-top: 2rem;
   text-align: center;
 }
+
 
 .btn-home:hover {
   background-color: #C9A17A;
@@ -214,6 +266,18 @@ p {
   }
 
   .team-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .values-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .values-list {
     grid-template-columns: 1fr;
   }
 }
