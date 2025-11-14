@@ -1,126 +1,44 @@
-<template>
-  <section class="air-quality-section" id="air-quality">
-    <div class="container">
-      <h2>Qualité de l'air</h2>
-      
-      <div class="quality-content">
-        <div v-if="loading" class="loading-state">Chargement des données...</div>
-        
-        <div v-else class="quality-grid">
-          <div class="quality-box">
-            <h3>Données météorologiques</h3>
-            <div class="data-rows">
-              <div class="data-row">
-                <div class="label-with-info">
-                  <span class="label">température :</span>
-                  <div class="info-tooltip">
-                    <span class="info-icon">ℹ</span>
-                    <div class="tooltip-text">Température actuelle de l'air en degrés Celsius</div>
-                  </div>
-                </div>
-                <span class="value">{{ airData.temperature }} °C</span>
-              </div>
-              <div class="data-row">
-                <div class="label-with-info">
-                  <span class="label">humidité relative :</span>
-                  <div class="info-tooltip">
-                    <span class="info-icon">ℹ</span>
-                    <div class="tooltip-text">Pourcentage d'humidité dans l'air</div>
-                  </div>
-                </div>
-                <span class="value">{{ airData.humidity }} %</span>
-              </div>
-              <div class="data-row">
-                <div class="label-with-info">
-                  <span class="label">pression atmosphérique :</span>
-                  <div class="info-tooltip">
-                    <span class="info-icon">ℹ</span>
-                    <div class="tooltip-text">Pression de l'air en hectopascals</div>
-                  </div>
-                </div>
-                <span class="value">{{ airData.pressure }} hPa</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="quality-box">
-            <h3>Particules atmosphériques</h3>
-            <div class="data-rows">
-              <div class="data-row">
-                <div class="label-with-info">
-                  <span class="label">pm2.5° :</span>
-                  <div class="info-tooltip">
-                    <span class="info-icon">ℹ</span>
-                    <div class="tooltip-text">Particules fines ≤ 2.5 μm (très dangereuses)</div>
-                  </div>
-                </div>
-                <span class="value">{{ airData.pm25 }} μg/m³</span>
-              </div>
-              <div class="data-row">
-                <div class="label-with-info">
-                  <span class="label">pm10° :</span>
-                  <div class="info-tooltip">
-                    <span class="info-icon">ℹ</span>
-                    <div class="tooltip-text">Particules ≤ 10 μm (inhalables)</div>
-                  </div>
-                </div>
-                <span class="value">{{ airData.pm10 }} μg/m³</span>
-              </div>
-              <div class="data-row">
-                <div class="label-with-info">
-                  <span class="label">o3 :</span>
-                  <div class="info-tooltip">
-                    <span class="info-icon">ℹ</span>
-                    <div class="tooltip-text">Ozone troposphérique (polluant secondaire)</div>
-                  </div>
-                </div>
-                <span class="value">{{ airData.o3 }} μg/m³</span>
-              </div>
-              <div class="data-row">
-                <div class="label-with-info">
-                  <span class="label">no2 :</span>
-                  <div class="info-tooltip">
-                    <span class="info-icon">ℹ</span>
-                    <div class="tooltip-text">Dioxyde d'azote (polluant du trafic)</div>
-                  </div>
-                </div>
-                <span class="value">{{ airData.no2 }} μg/m³</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="quality-index">
-            <div class="index-label-with-info">
-              <span>Indice global</span>
-              <div class="info-tooltip">
-                <span class="info-icon">ℹ</span>
-                <div class="tooltip-text">Indice de qualité de l'air global (0-500). Plus faible = meilleur</div>
-              </div>
-            </div>
-            <div :class="['index-badge', `index-${airData.indexLevel}`]">
-              {{ airData.index }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+interface AirData {
+  temperature: number | null
+  humidity: number | null
+  pressure: number | null
+  pm25: number | null
+  pm10: number | null
+  o3: number | null
+  no2: number | null
+  index: number | null
+  indexLevel: string | null
+}
+
+const translateIndexLevel = (level: string | null): string => {
+  if (!level) return "indisponible"
+
+  const map: Record<string, string> = {
+    "good": "Bon",
+    "moderate": "Modéré",
+    "unhealthy-sensitive": "Dégradé",
+    "unhealthy": "Mauvais",
+    "very-unhealthy": "Très mauvais",
+    "hazardous": "Dangereux"
+  }
+
+  return map[level] ?? level
+}
+
 const loading = ref(true)
-const airData = ref({
-  temperature: 17,
-  humidity: 72,
-  pressure: 1024,
-  pm25: 52,
-  pm10: 21,
-  o3: 29,
-  no2: 3.3,
-  index: 4,
-  indexLevel: 'good'
+const airData = ref<AirData>({
+  temperature: null,
+  humidity: null,
+  pressure: null,
+  pm25: null,
+  pm10: null,
+  o3: null,
+  no2: null,
+  index: null,
+  indexLevel: null
 })
 
 const fetchAirQuality = async () => {
@@ -130,19 +48,19 @@ const fetchAirQuality = async () => {
       'https://api.waqi.info/feed/rennes/?token=65f9c9e6ade05413509068cf513e9787ee6e6b97'
     )
     const data = await response.json()
-    
+
     if (data.data) {
       const iaqi = data.data.iaqi
       airData.value = {
-        temperature: data.data.forecast?.daily?.t?.[0]?.avg || 17,
-        humidity: iaqi.h?.v || 72,
-        pressure: iaqi.p?.v || 1024,
-        pm25: iaqi.pm25?.v || 52,
-        pm10: iaqi.pm10?.v || 21,
-        o3: iaqi.o3?.v || 29,
-        no2: iaqi.no2?.v || 3.3,
-        index: data.data.aqi,
-        indexLevel: getIndexLevel(data.data.aqi)
+        temperature: iaqi.t?.v ?? null,
+        humidity: iaqi.h?.v ?? null,
+        pressure: iaqi.p?.v ?? null,
+        pm25: iaqi.pm25?.v ?? null,
+        pm10: iaqi.pm10?.v ?? null,
+        o3: iaqi.o3?.v ?? null,
+        no2: iaqi.no2?.v ?? null,
+        index: data.data.aqi ?? null,
+        indexLevel: data.data.aqi ? getIndexLevel(data.data.aqi) : null
       }
     }
   } catch (error) {
@@ -166,7 +84,199 @@ onMounted(() => {
 })
 </script>
 
+<template>
+  <section class="air-quality-section" id="air-quality">
+    <div class="container">
+      <h2>Qualité de l'air</h2>
+
+      <!-- Carte principale avec l'indice global -->
+      <div class="main-card" :class="{ 'skeleton': loading }">
+        <div class="aqi-label" :class="{ 'skeleton-text': loading }">
+          {{ loading ? '' : 'Indice global' }}
+        </div>
+        <div class="aqi-circle" :class="[
+          loading ? 'skeleton-circle' : (airData.indexLevel ? `index-${airData.indexLevel}` : '')
+        ]">
+          <span v-if="!loading" class="aqi-value">
+            {{ airData.index !== null ? airData.index : 'N/A' }}
+          </span>
+        </div>
+        <div class="aqi-status" :class="{ 'skeleton-text': loading }">
+          {{ loading ? '' : translateIndexLevel(airData.indexLevel) }}
+        </div>
+      </div>
+
+      <!-- Grille pour les sections détaillées -->
+      <div class="quality-grid">
+        <!-- Particules atmosphériques -->
+        <div class="card" :class="{ 'skeleton': loading }">
+          <h3 class="card-title" :class="{ 'skeleton-text': loading }">
+            <template v-if="!loading">
+              Particules atmosphériques
+              <div class="info-tooltip">
+                <span class="info-icon">ℹ</span>
+                <div class="tooltip-text">Mesure des polluants dans l'air</div>
+              </div>
+            </template>
+          </h3>
+
+          <div class="particule-row" :class="{ 'skeleton-row': loading }">
+            <div class="data-content">
+              <span class="data-label" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">
+                  PM2.5
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Particules fines ≤ 2.5 μm (très dangereuses)</div>
+                  </div>
+                </template>
+              </span>
+              <span class="data-value" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">
+                  {{ airData.pm25 !== null ? airData.pm25 : 'N/A' }}
+                  <span class="data-unit">μg/m³</span>
+                </template>
+              </span>
+            </div>
+          </div>
+
+          <div class="particule-row" :class="{ 'skeleton-row': loading }">
+            <div class="data-content">
+              <span class="data-label" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">
+                  PM10
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Particules ≤ 10 μm (inhalables)</div>
+                  </div>
+                </template>
+              </span>
+              <span class="data-value" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">
+                  {{ airData.pm10 !== null ? airData.pm10 : 'N/A' }}
+                  <span class="data-unit">μg/m³</span>
+                </template>
+              </span>
+            </div>
+          </div>
+
+          <div class="particule-row" :class="{ 'skeleton-row': loading }">
+            <div class="data-content">
+              <span class="data-label" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">
+                  O3
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Ozone troposphérique (polluant secondaire)</div>
+                  </div>
+                </template>
+              </span>
+              <span class="data-value" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">
+                  {{ airData.o3 !== null ? airData.o3 : 'N/A' }}
+                  <span class="data-unit">μg/m³</span>
+                </template>
+              </span>
+            </div>
+          </div>
+
+          <div class="particule-row" :class="{ 'skeleton-row': loading }">
+            <div class="data-content">
+              <span class="data-label" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">
+                  NO2
+                  <div class="info-tooltip">
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Dioxyde d'azote (polluant du trafic)</div>
+                  </div>
+                </template>
+              </span>
+              <span class="data-value" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">
+                  {{ airData.no2 !== null ? airData.no2 : 'N/A' }}
+                  <span class="data-unit">μg/m³</span>
+                </template>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Données météorologiques -->
+        <div class="card" :class="{ 'skeleton': loading }">
+          <h3 class="card-title" :class="{ 'skeleton-text': loading }">
+            <template v-if="!loading">
+              Données météorologiques
+              <div class="info-tooltip">
+                <span class="info-icon">ℹ</span>
+                <div class="tooltip-text">Conditions météo actuelles</div>
+              </div>
+            </template>
+          </h3>
+
+          <div class="data-row" :class="{ 'skeleton-row': loading }">
+            <span class="data-label" :class="{ 'skeleton-text': loading }">
+              <template v-if="!loading">
+                Température
+                <div class="info-tooltip">
+                  <span class="info-icon">ℹ</span>
+                  <div class="tooltip-text">Température actuelle de l'air en degrés Celsius</div>
+                </div>
+              </template>
+            </span>
+            <span class="data-value" :class="{ 'skeleton-text': loading }">
+              <template v-if="!loading">
+                {{ airData.temperature !== null ? airData.temperature : 'N/A' }}
+                <span class="data-unit">°C</span>
+              </template>
+            </span>
+          </div>
+
+          <div class="data-row" :class="{ 'skeleton-row': loading }">
+            <span class="data-label" :class="{ 'skeleton-text': loading }">
+              <template v-if="!loading">
+                Humidité relative
+                <div class="info-tooltip">
+                  <span class="info-icon">ℹ</span>
+                  <div class="tooltip-text">Pourcentage d'humidité dans l'air</div>
+                </div>
+              </template>
+            </span>
+            <span class="data-value" :class="{ 'skeleton-text': loading }">
+              <template v-if="!loading">
+                {{ airData.humidity !== null ? airData.humidity : 'N/A' }}
+                <span class="data-unit">%</span>
+              </template>
+            </span>
+          </div>
+
+          <div class="data-row" :class="{ 'skeleton-row': loading }">
+            <span class="data-label" :class="{ 'skeleton-text': loading }">
+              <template v-if="!loading">
+                Pression atmosphérique
+                <div class="info-tooltip">
+                  <span class="info-icon">ℹ</span>
+                  <div class="tooltip-text">Pression de l'air en hectopascals</div>
+                </div>
+              </template>
+            </span>
+            <span class="data-value" :class="{ 'skeleton-text': loading }">
+              <template v-if="!loading">
+                {{ airData.pressure !== null ? airData.pressure : 'N/A' }}
+                <span class="data-unit">hPa</span>
+              </template>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
 <style scoped>
+* {
+  box-sizing: border-box;
+}
+
 .air-quality-section {
   background-color: #FCF3DF;
   padding: 3rem 0;
@@ -176,117 +286,185 @@ onMounted(() => {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 2rem;
 }
 
-.air-quality-section h2 {
+h2 {
   text-align: center;
-  color: #1B0808;
-  font-size: 2rem;
+  color: #2d3748;
+  font-size: 2.5rem;
   margin-bottom: 2rem;
+  font-weight: 600;
 }
 
-.quality-content {
-  background-color: white;
-  border-radius: 12px;
+/* Carte principale de l'indice */
+.main-card {
+  background: white;
+  border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.loading-state {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
   text-align: center;
-  padding: 2rem;
-  color: #666;
 }
 
+.aqi-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem auto 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.aqi-value {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: #2d3748;
+}
+
+.aqi-label {
+  font-size: 1.25rem;
+  color: #4a5568;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  min-height: 1.75rem;
+}
+
+.aqi-status {
+  font-size: 1rem;
+  color: #718096;
+  font-weight: 500;
+  min-height: 1.5rem;
+}
+
+/* Couleurs de l'indice */
+.index-good {
+  background: #009E73;
+  box-shadow: 0 4px 12px rgba(0, 158, 115, 0.4);
+}
+
+.index-good .aqi-value {
+  color: white;
+}
+
+.index-moderate {
+  background: #F0E442;
+  box-shadow: 0 4px 12px rgba(240, 228, 66, 0.4);
+}
+
+.index-unhealthy-sensitive {
+  background: #E69F00;
+  box-shadow: 0 4px 12px rgba(230, 159, 0, 0.4);
+}
+
+.index-unhealthy {
+  background: #D55E00;
+  box-shadow: 0 4px 12px rgba(213, 94, 0, 0.4);
+}
+
+.index-unhealthy .aqi-value {
+  color: white;
+}
+
+.index-very-unhealthy {
+  background: #CC0033;
+  box-shadow: 0 4px 12px rgba(204, 0, 51, 0.4);
+}
+
+.index-very-unhealthy .aqi-value {
+  color: white;
+}
+
+.index-hazardous {
+  background: #8E0152;
+  box-shadow: 0 4px 12px rgba(142, 1, 82, 0.4);
+}
+
+.index-hazardous .aqi-value {
+  color: white;
+}
+
+/* Grille pour les sections */
 .quality-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
 }
 
-.quality-box h3 {
-  margin-top: 0;
-  color: #1B0808;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
 }
 
-.data-rows {
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 1.5rem 0;
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.75rem;
 }
 
+/* Éléments de données météo */
 .data-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #F0F0F0;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .data-row:last-child {
   border-bottom: none;
 }
 
-.label {
-  color: #666;
+.data-label {
+  color: #4a5568;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.5rem;
+}
+
+.data-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  min-height: 1.75rem;
+}
+
+.data-unit {
   font-size: 0.9rem;
+  color: #718096;
+  margin-left: 0.25rem;
 }
 
-.value {
-  font-weight: 600;
-  color: #1B0808;
+/* Style pour les particules */
+.particule-row {
+  background: #f7fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
 }
 
-.quality-index {
+.particule-row:last-child {
+  margin-bottom: 0;
+}
+
+.data-content {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
 }
 
-.index-label {
-  color: #1B0808;
-  font-weight: 600;
-}
-
-.index-badge {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-.index-good { background-color: #90EE90; color: #1B0808; }
-.index-moderate { background-color: #FFFF99; color: #1B0808; }
-.index-unhealthy-sensitive { background-color: #FFB6C1; color: white; }
-.index-unhealthy { background-color: #FF6B6B; color: white; }
-.index-very-unhealthy { background-color: #9933FF; color: white; }
-.index-hazardous { background-color: #663300; color: white; }
-
-.label-with-info {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.index-label-with-info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  color: #1B0808;
-  font-weight: 600;
-}
-
+/* Info tooltips */
 .info-tooltip {
   position: relative;
   display: inline-flex;
@@ -295,21 +473,23 @@ onMounted(() => {
 }
 
 .info-icon {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #D4AF8F;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cbd5e0;
   border-radius: 50%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  color: #D4AF8F;
+  font-size: 12px;
+  color: #718096;
   cursor: help;
+  font-style: italic;
   flex-shrink: 0;
 }
 
 .tooltip-text {
   visibility: hidden;
+  opacity: 0;
   background-color: #1B0808;
   color: white;
   text-align: center;
@@ -324,7 +504,6 @@ onMounted(() => {
   font-size: 0.8rem;
   white-space: normal;
   line-height: 1.4;
-  opacity: 0;
   transition: opacity 0.3s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
@@ -344,26 +523,72 @@ onMounted(() => {
   opacity: 1;
 }
 
-/* Responsive design for tablets and mobile */
+/* Skeleton loading states */
+@keyframes skeleton-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton-text {
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e0 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+  color: transparent !important;
+  user-select: none;
+  min-width: 80px;
+  display: inline-block;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-circle {
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e0 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+.skeleton-row .data-label,
+.skeleton-row .data-value {
+  min-width: 100px;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .air-quality-section h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
+  .container {
+    padding: 0 1rem;
+  }
+
+  h2 {
+    font-size: 2rem;
   }
 
   .quality-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
   }
 
-  .quality-content {
-    padding: 1.5rem;
+  .aqi-circle {
+    width: 120px;
+    height: 120px;
   }
 
-  .index-badge {
-    width: 70px;
-    height: 70px;
-    font-size: 1.25rem;
+  .aqi-value {
+    font-size: 3rem;
   }
 }
 
@@ -372,32 +597,31 @@ onMounted(() => {
     padding: 2rem 0;
   }
 
-  .container {
-    padding: 0 0.75rem;
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
-  .air-quality-section h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
+  .main-card,
+  .card {
+    padding: 1.25rem;
   }
 
-  .quality-content {
-    padding: 1rem;
-    border-radius: 8px;
+  .aqi-circle {
+    width: 100px;
+    height: 100px;
   }
 
-  .label {
-    font-size: 0.8rem;
+  .aqi-value {
+    font-size: 2.5rem;
   }
 
-  .value {
-    font-size: 0.9rem;
+  .data-label {
+    font-size: 0.85rem;
   }
 
-  .index-badge {
-    width: 60px;
-    height: 60px;
-    font-size: 1rem;
+  .data-value {
+    font-size: 1.1rem;
   }
 }
 </style>
