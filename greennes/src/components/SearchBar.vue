@@ -7,18 +7,21 @@ const selectedLocation = ref('')
 const suggestions = ref<string[]>([])
 const showSuggestions = ref(false)
 const loading = ref(false)
+const errorMsg = ref('')
+const searchResultsMode = ref(false)
+const hasSelectedLocation = ref(false)
 const emit = defineEmits(['location-selected'])
 
-// Rectangle englobant Rennes : sud-ouest (lon1, lat1), nord-est (lon2, lat2)
-const RENNES_VIEWBOX = "-1.745,48.070,-1.620,48.153" // (lon1,lat1,lon2,lat2)
+const RENNES_VIEWBOX = "-1.745,48.070,-1.620,48.153"
 
+// Ferme l'autocomplétion dropdown après perte de focus
 const hideSuggestions = () => {
   window.setTimeout(() => {
     showSuggestions.value = false
   }, 200)
 }
 
-// Attente avant complétion, Rennes seulement
+// Cherche (avec debounce) et dédoublonne les suggestions :
 const debouncedFetchSuggestions = debounce(async () => {
   if (searchQuery.value.length < 3) {
     suggestions.value = []
@@ -26,74 +29,78 @@ const debouncedFetchSuggestions = debounce(async () => {
     return
   }
   loading.value = true
+  errorMsg.value = ''
   try {
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value)}&limit=5&countrycodes=fr&viewbox=${RENNES_VIEWBOX}&bounded=1&addressdetails=1&extratags=1&namedetails=1`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value)}&limit=10&countrycodes=fr&viewbox=${RENNES_VIEWBOX}&bounded=1&addressdetails=1&extratags=1&namedetails=1`
     )
     const data = await response.json()
 
-    // Construction et dédoublonnage des labels
     const seen = new Set<string>()
-    suggestions.value = data
-      .map((item: any) => {
-        const a = item.address || {}
-        const name = item.namedetails?.name
+    const uniqueLabels: string[] = []
 
-        let mainLabel = ''
-        if (name) mainLabel = name
-        else if (a.place) mainLabel = a.place
-        else if (a.shop) mainLabel = a.shop
-        else if (a.public_building) mainLabel = a.public_building
+    data.forEach((item: any) => {
+      const a = item.address || {}
+      const name = item.namedetails?.name
 
-        let streetLabel = ''
-        if (a.road) {
-          streetLabel = a.road
-          if (a.house_number) streetLabel = `${a.house_number} ${streetLabel}`
-        }
-        let combined = mainLabel.trim()
-        if (streetLabel) {
-          if (combined) combined += ` – ${streetLabel}`
-          else combined = streetLabel
-        }
-        return combined || item.display_name
-      })
-      // On retire les doublons
-      .filter((label: string) => {
-      if (seen.has(label)) return false
-      seen.add(label)
-      return true
-      })
+      let mainLabel = ''
+      if (name) mainLabel = name
+      else if (a.place) mainLabel = a.place
+      else if (a.shop) mainLabel = a.shop
+      else if (a.public_building) mainLabel = a.public_building
 
-      .slice(0, 5) // Garde le top 5 uniques seulement
+      let streetLabel = ''
+      if (a.road) {
+        streetLabel = a.road
+        if (a.house_number) streetLabel = `${a.house_number} ${streetLabel}`
+      }
+      let combined = mainLabel.trim()
+      if (streetLabel) {
+        if (combined) combined += ` – ${streetLabel}`
+        else combined = streetLabel
+      }
+      if (!combined) combined = item.display_name
+
+      if (!seen.has(combined)) {
+        seen.add(combined)
+        uniqueLabels.push(combined)
+      }
+    })
+    suggestions.value = uniqueLabels.slice(0, 5)
   } catch (error) {
-    console.error('Erreur chargement suggestions:', error)
+    errorMsg.value = "Erreur lors du chargement des suggestions."
     suggestions.value = []
   } finally {
     loading.value = false
   }
 }, 400)
 
-
-
-
-// Watch searchQuery for suggested results (debounced)
+// À chaque modification du champ recherche, reset affichage et suggestions
 watch(searchQuery, () => {
+  if (searchResultsMode.value) searchResultsMode.value = false
+  hasSelectedLocation.value = false
+  selectedLocation.value = ''
   debouncedFetchSuggestions()
 })
 
+// Sélectionne la suggestion (que ce soit par la liste ou dropdown)
 const selectSuggestion = async (query: string) => {
   searchQuery.value = query
+  loading.value = false
   showSuggestions.value = false
-  loading.value = true
+  errorMsg.value = ''
+  loading.value = false
+  hasSelectedLocation.value = false
+
   try {
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=fr` +
-      `&viewbox=${RENNES_VIEWBOX}&bounded=1`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=fr&viewbox=${RENNES_VIEWBOX}&bounded=1`
     )
     const data = await response.json()
     if (data.length > 0) {
       const result = data[0]
       selectedLocation.value = query
+      hasSelectedLocation.value = true
       emit('location-selected', {
         name: query,
         lat: parseFloat(result.lat),
@@ -101,17 +108,31 @@ const selectSuggestion = async (query: string) => {
       })
     }
   } catch (error) {
-    console.error('Erreur géocodage:', error)
-  } finally {
-    loading.value = false
+    errorMsg.value = "Impossible de récupérer la localisation sélectionnée."
   }
 }
 
+// Sur "Rechercher" ou Entrée, affiche suggestions sous la barre (ou message d’erreur)
 const performSearch = async () => {
+  errorMsg.value = ''
+  searchResultsMode.value = false
+  hasSelectedLocation.value = false
+  selectedLocation.value = ''
   if (searchQuery.value.trim()) {
-    await selectSuggestion(searchQuery.value)
+    await debouncedFetchSuggestions.flush?.()
+    if (!suggestions.value.length) {
+      errorMsg.value = "Aucun lieu trouvé pour votre recherche."
+    } else {
+      searchResultsMode.value = true
+    }
   }
 }
+
+// Action sur suggestion fixe sous la barre
+const selectFromList = (label: string) => {
+  selectSuggestion(label)
+}
+
 </script>
 
 <template>
@@ -128,31 +149,38 @@ const performSearch = async () => {
             type="text"
             placeholder="Rechercher un lieu à Rennes"
             class="search-input"
-            @keyup.enter="selectSuggestion(searchQuery)"
+            @keyup.enter="performSearch"
+            @input="showSuggestions = true"
             @focus="showSuggestions = true"
             @blur="hideSuggestions"
             autocomplete="off"
           />
-          <!-- Loading indicator -->
-          <div v-if="loading" class="loading-spinner">Chargement…</div>
-          <!-- Autocomplete suggestions dropdown -->
-          <div v-if="showSuggestions && suggestions.length > 0" class="suggestions-dropdown">
+          <!-- Loading classique (pendant fetch suggestions/autocomplete uniquement) -->
+          <div v-if="loading && !searchResultsMode && showSuggestions" class="loading-spinner">Chargement…</div>
+          <!-- Autocomplétion classique dropdown = suggestions sur frappe -->
+          <div v-if="showSuggestions && suggestions.length > 0 && !searchResultsMode" class="suggestions-dropdown">
             <button
               v-for="(suggestion, idx) in suggestions"
               :key="idx"
               class="suggestion-item"
-              @click="selectSuggestion(suggestion)"
-            >
-              <svg class="location-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-              </svg>
-              <span>{{ suggestion }}</span>
-            </button>
+              @mousedown.prevent="selectSuggestion(suggestion)"
+            >{{ suggestion }}</button>
           </div>
         </div>
         <button @click="performSearch" class="search-button">Rechercher</button>
       </div>
-      <div v-if="selectedLocation" class="location-info">
+      <!-- Bloc d'erreur sous la barre -->
+      <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
+      <!-- Liste des résultats fixés sous la barre visible uniquement après recherche -->
+      <div v-if="searchResultsMode && suggestions.length > 0" class="suggestions-underbar">
+        <button
+          v-for="(suggestion, idx) in suggestions"
+          :key="idx"
+          class="suggestion-item"
+          @click="selectFromList(suggestion)"
+        >{{ suggestion }}</button>
+      </div>
+      <div v-if="hasSelectedLocation && selectedLocation" class="location-info">
         <p>Voici les différents équipements et lieux à proximité de : <strong>{{ selectedLocation }}</strong></p>
       </div>
     </div>
@@ -167,6 +195,28 @@ const performSearch = async () => {
   font-size: 0.85rem;
   color: #999;
   z-index: 99;
+}
+.error-msg {
+  color: #d00;
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+}
+.suggestions-underbar {
+  margin-top: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.suggestions-underbar .suggestion-item {
+  background: #f7f4ee;
+  border: none;
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.suggestions-underbar .suggestion-item:hover {
+  background: #f4eada;
 }
 .search-section {
   background-color: #FCF3DF;
