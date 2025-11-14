@@ -2,43 +2,32 @@
   <section class="rating-section" id="comment">
     <div class="container">
       <h2>Noter un lieu</h2>
-      
+
       <div class="form-container">
         <p class="form-intro">Vous souhaitez noter un jardin, une station de vélo ou autre ?</p>
-        
+
         <form @submit.prevent="submitRating" class="rating-form">
           <div class="form-group">
             <label for="infrastructure-type">Choisissez le type d'infrastructure :</label>
-            <input
-              id="infrastructure-type"
-              v-model="form.infrastructureType"
-              type="text"
-              placeholder="Ex: Station de vélo, Parc, etc."
-              class="form-input"
-            />
+            <select id="infrastructure-type" v-model="form.infrastructureType" class="form-input">
+              <option value="" disabled>-- Sélectionnez --</option>
+              <option value="Parc">Parc</option>
+              <option value="Station de vélo">Station de vélo</option>
+              <option value="Poubelles de déchets alimentaires">Poubelles de déchets alimentaires</option>
+            </select>
           </div>
+
 
           <div class="form-group">
             <label for="location">Choisissez le lieu :</label>
-            <input
-              id="location"
-              v-model="form.location"
-              type="text"
-              placeholder="Nom du lieu"
-              class="form-input"
-            />
+            <input id="location" v-model="form.location" type="text" placeholder="Nom du lieu" class="form-input" />
           </div>
 
           <div class="form-group">
             <label for="rating">Saisissez la note :</label>
             <div class="rating-stars">
-              <button
-                v-for="star in 5"
-                :key="star"
-                type="button"
-                @click="form.rating = star"
-                :class="['star', { filled: star <= form.rating }]"
-              >
+              <button v-for="star in 5" :key="star" type="button" @click="form.rating = star"
+                :class="['star', { filled: star <= form.rating }]">
                 ★
               </button>
             </div>
