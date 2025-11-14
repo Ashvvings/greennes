@@ -2,46 +2,38 @@
   <section class="rating-section" id="comment">
     <div class="container">
       <h2>Noter un lieu</h2>
-      
+
       <div class="form-container">
         <p class="form-intro">Vous souhaitez noter un jardin, une station de vélo ou autre ?</p>
-        
+
         <form @submit.prevent="submitRating" class="rating-form">
           <div class="form-group">
             <label for="infrastructure-type">Choisissez le type d'infrastructure :</label>
-            <input
-              id="infrastructure-type"
-              v-model="form.infrastructureType"
-              type="text"
-              placeholder="Ex: Station de vélo, Parc, etc."
-              class="form-input"
-            />
+            <select id="infrastructure-type" v-model="form.infrastructureType" class="form-input">
+              <option value="" disabled>-- Sélectionnez --</option>
+              <option value="Parc">Parc</option>
+              <option value="Station de vélo">Station de vélo</option>
+              <option value="Poubelles de déchets alimentaires">Poubelles de déchets alimentaires</option>
+            </select>
+            <span class="error-message" v-if="errors.infrastructureType">{{ errors.infrastructureType }}</span>
           </div>
 
           <div class="form-group">
             <label for="location">Choisissez le lieu :</label>
-            <input
-              id="location"
-              v-model="form.location"
-              type="text"
-              placeholder="Nom du lieu"
-              class="form-input"
-            />
+            <input id="location" v-model="form.location" type="text" placeholder="Nom du lieu" class="form-input" />
+            <span class="error-message" v-if="errors.location">{{ errors.location }}</span>
           </div>
 
           <div class="form-group">
             <label for="rating">Saisissez la note :</label>
             <div class="rating-stars">
-              <button
-                v-for="star in 5"
-                :key="star"
-                type="button"
-                @click="form.rating = star"
-                :class="['star', { filled: star <= form.rating }]"
-              >
+              <button v-for="star in 5" :key="star" type="button" @click="form.rating = star"
+                @mouseover="hoverRating = star" @mouseleave="hoverRating = 0"
+                :class="['star', { filled: star <= (hoverRating || form.rating) }]">
                 ★
               </button>
             </div>
+            <span class="error-message" v-if="errors.rating">{{ errors.rating }}</span>
           </div>
 
           <button type="submit" class="submit-btn">Merci pour votre aide !</button>
@@ -52,19 +44,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 
-const form = ref({
+interface FormData {
+  infrastructureType: string
+  location: string
+  rating: number
+}
+
+const form = reactive<FormData>({
   infrastructureType: '',
   location: '',
   rating: 0
 })
 
+const hoverRating = ref(0)
+
 const submitRating = () => {
-  console.log('Rating submitted:', form.value)
+  errors.infrastructureType = ''
+  errors.location = ''
+  errors.rating = ''
+
+  let hasError = false
+
+  if (!form.infrastructureType) {
+    errors.infrastructureType = 'Veuillez sélectionner un type de lieu.'
+    hasError = true
+  }
+  if (!form.location) {
+    errors.location = 'Veuillez saisir le nom du lieu.'
+    hasError = true
+  }
+  if (!form.rating) {
+    errors.rating = 'Veuillez attribuer une note au lieu.'
+    hasError = true
+  }
+
+  if (hasError) return
+
+  console.log('Rating submitted:', form)
   alert('Merci pour votre avis !')
-  form.value = { infrastructureType: '', location: '', rating: 0 }
+  form.infrastructureType = ''
+  form.location = ''
+  form.rating = 0
+  hoverRating.value = 0
 }
+
+
+const errors = reactive({
+  infrastructureType: '',
+  location: '',
+  rating: ''
+})
+
 </script>
 
 <style scoped>
@@ -78,6 +110,12 @@ const submitRating = () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+}
+
+.error-message {
+  color: #D32F2F;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
 }
 
 .rating-section h2 {
@@ -137,31 +175,21 @@ const submitRating = () => {
 
 .rating-stars {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   justify-content: center;
 }
 
 .star {
-  background: white;
-  border: 2px solid #D4AF8F;
+  background: none;
+  border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: #D4AF8F;
-  transition: all 0.2s;
-  padding: 0.25rem;
-  border-radius: 4px;
+  color: white;
+  transition: color 0.2s;
 }
 
 .star.filled {
-  background-color: #FFC107;
-  color: white;
-  border-color: #FFC107;
-}
-
-.star:hover {
-  background-color: #FFC107;
-  color: white;
-  border-color: #FFC107;
+  color: #FFC107;
 }
 
 .submit-btn {
@@ -180,7 +208,6 @@ const submitRating = () => {
   background-color: #C9A17A;
 }
 
-/* Responsive design for tablets and mobile */
 @media (max-width: 768px) {
   .rating-section h2 {
     font-size: 1.5rem;
