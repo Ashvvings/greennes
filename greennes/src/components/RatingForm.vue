@@ -17,7 +17,6 @@
             </select>
           </div>
 
-
           <div class="form-group">
             <label for="location">Choisissez le lieu :</label>
             <input id="location" v-model="form.location" type="text" placeholder="Nom du lieu" class="form-input" />
@@ -27,7 +26,8 @@
             <label for="rating">Saisissez la note :</label>
             <div class="rating-stars">
               <button v-for="star in 5" :key="star" type="button" @click="form.rating = star"
-                :class="['star', { filled: star <= form.rating }]">
+                @mouseover="hoverRating = star" @mouseleave="hoverRating = 0"
+                :class="['star', { filled: star <= (hoverRating || form.rating) }]">
                 ★
               </button>
             </div>
@@ -41,18 +41,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 
-const form = ref({
+interface FormData {
+  infrastructureType: string
+  location: string
+  rating: number
+}
+
+const form = reactive<FormData>({
   infrastructureType: '',
   location: '',
   rating: 0
 })
 
+const hoverRating = ref(0)
+
 const submitRating = () => {
-  console.log('Rating submitted:', form.value)
+  console.log('Rating submitted:', form)
   alert('Merci pour votre avis !')
-  form.value = { infrastructureType: '', location: '', rating: 0 }
+  form.infrastructureType = ''
+  form.location = ''
+  form.rating = 0
+  hoverRating.value = 0
 }
 </script>
 
@@ -126,31 +137,21 @@ const submitRating = () => {
 
 .rating-stars {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   justify-content: center;
 }
 
 .star {
-  background: white;
-  border: 2px solid #D4AF8F;
+  background: none;
+  border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: #D4AF8F;
-  transition: all 0.2s;
-  padding: 0.25rem;
-  border-radius: 4px;
+  color: white;
+  transition: color 0.2s;
 }
 
 .star.filled {
-  background-color: #FFC107;
-  color: white;
-  border-color: #FFC107;
-}
-
-.star:hover {
-  background-color: #FFC107;
-  color: white;
-  border-color: #FFC107;
+  color: #FFC107;
 }
 
 .submit-btn {
@@ -169,7 +170,6 @@ const submitRating = () => {
   background-color: #C9A17A;
 }
 
-/* Responsive design for tablets and mobile */
 @media (max-width: 768px) {
   .rating-section h2 {
     font-size: 1.5rem;
