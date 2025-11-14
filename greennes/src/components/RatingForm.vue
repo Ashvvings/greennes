@@ -15,11 +15,13 @@
               <option value="Station de vélo">Station de vélo</option>
               <option value="Poubelles de déchets alimentaires">Poubelles de déchets alimentaires</option>
             </select>
+            <span class="error-message" v-if="errors.infrastructureType">{{ errors.infrastructureType }}</span>
           </div>
 
           <div class="form-group">
             <label for="location">Choisissez le lieu :</label>
             <input id="location" v-model="form.location" type="text" placeholder="Nom du lieu" class="form-input" />
+            <span class="error-message" v-if="errors.location">{{ errors.location }}</span>
           </div>
 
           <div class="form-group">
@@ -31,6 +33,7 @@
                 ★
               </button>
             </div>
+            <span class="error-message" v-if="errors.rating">{{ errors.rating }}</span>
           </div>
 
           <button type="submit" class="submit-btn">Merci pour votre aide !</button>
@@ -58,6 +61,27 @@ const form = reactive<FormData>({
 const hoverRating = ref(0)
 
 const submitRating = () => {
+  errors.infrastructureType = ''
+  errors.location = ''
+  errors.rating = ''
+
+  let hasError = false
+
+  if (!form.infrastructureType) {
+    errors.infrastructureType = 'Veuillez sélectionner un type de lieu.'
+    hasError = true
+  }
+  if (!form.location) {
+    errors.location = 'Veuillez saisir le nom du lieu.'
+    hasError = true
+  }
+  if (!form.rating) {
+    errors.rating = 'Veuillez attribuer une note au lieu.'
+    hasError = true
+  }
+
+  if (hasError) return
+
   console.log('Rating submitted:', form)
   alert('Merci pour votre avis !')
   form.infrastructureType = ''
@@ -65,6 +89,14 @@ const submitRating = () => {
   form.rating = 0
   hoverRating.value = 0
 }
+
+
+const errors = reactive({
+  infrastructureType: '',
+  location: '',
+  rating: ''
+})
+
 </script>
 
 <style scoped>
@@ -78,6 +110,12 @@ const submitRating = () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+}
+
+.error-message {
+  color: #D32F2F;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
 }
 
 .rating-section h2 {
