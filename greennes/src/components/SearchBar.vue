@@ -11,17 +11,17 @@ const errorMsg = ref('')
 const searchResultsMode = ref(false)
 const hasSelectedLocation = ref(false)
 const emit = defineEmits(['location-selected'])
+const lastSearched = ref('')
+const showAutocompleteResults = ref(false)
 
 const RENNES_VIEWBOX = "-1.745,48.070,-1.620,48.153"
 
-// Ferme l'autocomplétion dropdown après perte de focus
 const hideSuggestions = () => {
   window.setTimeout(() => {
     showSuggestions.value = false
   }, 200)
 }
 
-// Cherche (avec debounce) et dédoublonne les suggestions :
 const debouncedFetchSuggestions = debounce(async () => {
   if (searchQuery.value.length < 3) {
     suggestions.value = []
@@ -75,22 +75,16 @@ const debouncedFetchSuggestions = debounce(async () => {
   }
 }, 400)
 
-// À chaque modification du champ recherche, reset affichage et suggestions
 watch(searchQuery, () => {
   if (searchResultsMode.value) searchResultsMode.value = false
-  hasSelectedLocation.value = false
-  selectedLocation.value = ''
   debouncedFetchSuggestions()
 })
 
-// Sélectionne la suggestion (que ce soit par la liste ou dropdown)
 const selectSuggestion = async (query: string) => {
-  searchQuery.value = query
-  loading.value = false
   showSuggestions.value = false
-  errorMsg.value = ''
+  showAutocompleteResults.value = false
   loading.value = false
-  hasSelectedLocation.value = false
+  errorMsg.value = ''
 
   try {
     const response = await fetch(
@@ -98,13 +92,13 @@ const selectSuggestion = async (query: string) => {
     )
     const data = await response.json()
     if (data.length > 0) {
-      const result = data[0]
       selectedLocation.value = query
       hasSelectedLocation.value = true
+      searchQuery.value = ''
       emit('location-selected', {
         name: query,
-        lat: parseFloat(result.lat),
-        lon: parseFloat(result.lon)
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon)
       })
     }
   } catch (error) {
@@ -112,7 +106,6 @@ const selectSuggestion = async (query: string) => {
   }
 }
 
-// Sur "Rechercher" ou Entrée, affiche suggestions sous la barre (ou message d’erreur)
 const performSearch = async () => {
   errorMsg.value = ''
   searchResultsMode.value = false
@@ -122,16 +115,19 @@ const performSearch = async () => {
     await debouncedFetchSuggestions.flush?.()
     if (!suggestions.value.length) {
       errorMsg.value = "Aucun lieu trouvé pour votre recherche."
+      showAutocompleteResults.value = false
     } else {
       searchResultsMode.value = true
+      showAutocompleteResults.value = true
+      lastSearched.value = searchQuery.value.trim()
     }
   }
 }
 
-// Action sur suggestion fixe sous la barre
 const selectFromList = (label: string) => {
   selectSuggestion(label)
 }
+
 
 </script>
 
@@ -171,8 +167,12 @@ const selectFromList = (label: string) => {
       </div>
       <!-- Bloc d'erreur sous la barre -->
       <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
+      <div v-if="searchResultsMode && suggestions.length > 0 && !hasSelectedLocation && !selectedLocation" class="autocomplete-title">
+      Sélectionnez un des lieux qui correspondent à : "<strong>{{ lastSearched }}</strong>".
+      </div>
+
       <!-- Liste des résultats fixés sous la barre visible uniquement après recherche -->
-      <div v-if="searchResultsMode && suggestions.length > 0" class="suggestions-underbar">
+      <div v-if="searchResultsMode && suggestions.length > 0 && !hasSelectedLocation && !selectedLocation" class="suggestions-underbar">
         <button
           v-for="(suggestion, idx) in suggestions"
           :key="idx"
