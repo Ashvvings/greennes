@@ -28,7 +28,6 @@
   background-color: #E8D5AA;
   color: #1B0808;
   padding: 2rem 1rem;
-  margin-top: 4rem;
   text-align: center;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
 }
