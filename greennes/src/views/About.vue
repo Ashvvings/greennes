@@ -63,19 +63,19 @@
         <div class="values-list">
           <div class="value-item">
             <h4>🌱 Durabilité</h4>
-            <p>Promouvoir les modes de vie écologiques et responsables</p>
+            <p>Promouvoir les modes de vie écologiques et responsables.</p>
           </div>
           <div class="value-item">
             <h4>🤝 Accessibilité</h4>
-            <p>Rendre l'information accessible à tou·te·s les Rennais·e·s</p>
+            <p>Rendre l'information accessible à tou·te·s les Rennais·e·s.</p>
           </div>
           <div class="value-item">
             <h4>🗺️ Localisation</h4>
-            <p>Découvrir les services près de soi facilement</p>
+            <p>Découvrir les services près de soi facilement.</p>
           </div>
           <div class="value-item">
             <h4>💡 Innovation</h4>
-            <p>Utiliser la technologie pour améliorer la vie urbaine</p>
+            <p>Utiliser la technologie pour améliorer la vie urbaine.</p>
           </div>
         </div>
       </section>
@@ -91,8 +91,7 @@
 <style scoped>
 .about-view {
   background-color: #FCF3DF;
-  min-height: 100vh;
-  padding: 6rem 0 3rem 0;
+  padding: 2rem 0 0 0;
 }
 
 .about-container {
@@ -236,7 +235,7 @@ p {
 .btn-home {
   display: block;
   width: fit-content;
-  margin: 2rem auto 0;
+  margin: 1rem auto 0;
   background-color: #D4AF8F;
   color: #1B0808;
   padding: 0.75rem 1.5rem;
