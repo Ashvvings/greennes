@@ -1,0 +1,367 @@
+{
+
+    "total_count":57,
+    "results":[
+        {
+            "idstation":"5505",
+            "nom":"Sainte-Anne",
+            "coordonnees":{
+                "lon":-1.680534,
+                "lat":48.114219
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":24,
+            "nombreemplacementsdisponibles":9,
+            "nombrevelosdisponibles":15,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5509",
+            "nom":"Saint-Georges Piscine",
+            "coordonnees":{
+                "lon":-1.674417,
+                "lat":48.112385
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":18,
+            "nombreemplacementsdisponibles":7,
+            "nombrevelosdisponibles":11,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5510",
+            "nom":"Musée Beaux-Arts",
+            "coordonnees":{
+                "lon":-1.67408,
+                "lat":48.109601
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":16,
+            "nombreemplacementsdisponibles":6,
+            "nombrevelosdisponibles":10,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5514",
+            "nom":"Bonnets Rouges",
+            "coordonnees":{
+                "lon":-1.665814,
+                "lat":48.106846
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":24,
+            "nombreemplacementsdisponibles":24,
+            "nombrevelosdisponibles":0,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5517",
+            "nom":"Charles de Gaulle",
+            "coordonnees":{
+                "lon":-1.677119,
+                "lat":48.105111
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":24,
+            "nombreemplacementsdisponibles":16,
+            "nombrevelosdisponibles":8,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5519",
+            "nom":"Colombier",
+            "coordonnees":{
+                "lon":-1.680454,
+                "lat":48.106045
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":24,
+            "nombreemplacementsdisponibles":14,
+            "nombrevelosdisponibles":10,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5520",
+            "nom":"Pont de Nantes",
+            "coordonnees":{
+                "lon":-1.684015,
+                "lat":48.102015
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":20,
+            "nombreemplacementsdisponibles":15,
+            "nombrevelosdisponibles":5,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5522",
+            "nom":"Oberthur",
+            "coordonnees":{
+                "lon":-1.661853,
+                "lat":48.11355
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":30,
+            "nombreemplacementsdisponibles":19,
+            "nombrevelosdisponibles":11,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5537",
+            "nom":"Auberge de Jeunesse",
+            "coordonnees":{
+                "lon":-1.681876,
+                "lat":48.120876
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":29,
+            "nombreemplacementsdisponibles":16,
+            "nombrevelosdisponibles":13,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5540",
+            "nom":"Croix Saint-Hélier",
+            "coordonnees":{
+                "lon":-1.662078,
+                "lat":48.103044
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":19,
+            "nombreemplacementsdisponibles":14,
+            "nombrevelosdisponibles":5,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5542",
+            "nom":"Robidou",
+            "coordonnees":{
+                "lon":-1.659376,
+                "lat":48.109924
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":20,
+            "nombreemplacementsdisponibles":11,
+            "nombrevelosdisponibles":9,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5548",
+            "nom":"Beaulieu - Université",
+            "coordonnees":{
+                "lon":-1.639922,
+                "lat":48.121926
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":29,
+            "nombreemplacementsdisponibles":22,
+            "nombrevelosdisponibles":7,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5566",
+            "nom":"Bréquigny Piscine",
+            "coordonnees":{
+                "lon":-1.69034,
+                "lat":48.089986
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":24,
+            "nombreemplacementsdisponibles":17,
+            "nombrevelosdisponibles":7,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5569",
+            "nom":"Champs Manceaux",
+            "coordonnees":{
+                "lon":-1.682284,
+                "lat":48.091114
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":18,
+            "nombreemplacementsdisponibles":13,
+            "nombrevelosdisponibles":5,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5580",
+            "nom":"Painlevé",
+            "coordonnees":{
+                "lon":-1.659762,
+                "lat":48.123463
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":29,
+            "nombreemplacementsdisponibles":21,
+            "nombrevelosdisponibles":8,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5582",
+            "nom":"La Poterie",
+            "coordonnees":{
+                "lon":-1.643683,
+                "lat":48.087309
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":20,
+            "nombreemplacementsdisponibles":11,
+            "nombrevelosdisponibles":9,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5585",
+            "nom":"La Courrouze",
+            "coordonnees":
+            {
+                "lon":-1.694512,
+                "lat":48.099043
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":20,
+            "nombreemplacementsdisponibles":11,
+            "nombrevelosdisponibles":9,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5586",
+            "nom":"Armorique",
+            "coordonnees":{
+                "lon":-1.676108,
+                "lat":48.129912
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":24,
+            "nombreemplacementsdisponibles":23,
+            "nombrevelosdisponibles":1,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5588",
+            "nom":"Gare Sud Féval",
+            "coordonnees":{
+                "lon":-1.673928,
+                "lat":48.102065
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":24,
+            "nombreemplacementsdisponibles":14,
+            "nombrevelosdisponibles":10,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+        ,
+        {
+            "idstation":"5591",
+            "nom":"Mabilais",
+            "coordonnees":{
+                "lon":-1.693098,
+                "lat":48.105108
+            }
+            ,
+            "etat":[
+                "En fonctionnement"
+            ]
+            ,
+            "nombreemplacementsactuels":25,
+            "nombreemplacementsdisponibles":15,
+            "nombrevelosdisponibles":10,
+            "lastupdate":"2025-11-17T14:57:11+00:00"
+        }
+    ]
+
+}
