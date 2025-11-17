@@ -1,11 +1,7 @@
 <template>
   <div class="category-card">
     <div class="card-header">
-      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="18" cy="17" r="3"></circle>
-        <circle cx="6" cy="17" r="3"></circle>
-        <path d="M4 6h16M4 12h16"></path>
-      </svg>
+      <FontAwesomeIcon :icon="['fas', 'bicycle']" class="card-icon" />
       <h3>Vélos</h3>
       <p class="subtitle">Location et stationnement</p>
     </div>
@@ -87,12 +83,12 @@ const fetchBikeData = async () => {
       'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/etat-des-stations-le-velo-star-en-temps-reel/records?limit=10'
     )
     const data = await response.json()
-    
+    console.log(data.results[0])
     bikeData.value = data.results.map((station: any) => ({
       name: station.nom_station,
       type: 'station',
       available: station.nombrevelosdisponibles,
-      capacity: station.nombreemplacementsdisponibles,
+      capacity: station.nombrevelosdisponibles + station.nombreemplacementsdisponibles,
       lat: station.coordonnees.lat,
       lon: station.coordonnees.lon
     }))
