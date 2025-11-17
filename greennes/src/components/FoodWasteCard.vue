@@ -85,9 +85,7 @@ onMounted(async () => {
 <template>
   <div class="category-card">
     <div class="card-header">
-      <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-      </svg>
+      <FontAwesomeIcon :icon="['fas', 'recycle']" class="card-icon" />
       <h3>Déchets alimentaires</h3>
       <p class="subtitle">Composts et poubelles</p>
     </div>
