@@ -86,8 +86,10 @@ onMounted(async () => {
   <div class="category-card">
     <div class="card-header">
       <FontAwesomeIcon :icon="['fas', 'recycle']" class="card-icon" />
-      <h3>Déchets alimentaires</h3>
-      <p class="subtitle">Composts et poubelles</p>
+      <div class="header-content">
+        <h3>Déchets alimentaires</h3>
+        <p class="subtitle">Composts et poubelles</p>
+      </div>
     </div>
     <div class="card-content">
       <div v-if="loading" class="loading">Chargement...</div>
@@ -141,23 +143,32 @@ onMounted(async () => {
 
 .card-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+}
+
+.items-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.item {
+  background-color: #F9F9F9;
+  border-radius: 8px;
+  border-left: 3px solid #D4AF8F;
+  padding: 0.75rem;
+  flex: 1 1 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .loading, .items-list {
   min-height: 80px;
-}
-
-.items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.item {
-  padding: 0.75rem;
-  background-color: #F9F9F9;
-  border-radius: 8px;
-  border-left: 3px solid #D4AF8F;
 }
 
 .item-header h4 {
