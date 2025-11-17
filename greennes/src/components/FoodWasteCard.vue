@@ -1,47 +1,109 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { calculateDistance, formatDistance } from '../utils/geoLocation'
+import type { Location } from '../types/location'
 
-const composts = ref([])
-const daBins = ref([])
-const loadingComposts = ref(false)
-const loadingDA = ref(false)
+const props = defineProps<{ location: Location }>()
+
+interface WasteItem {
+  name: string
+  lat: number
+  lon: number
+  formattedDistance?: string
+}
+
+const loading = ref(true)
+const daBins = ref<WasteItem[]>([])
+const composts = ref<WasteItem[]>([])
+
+const fetchDaBins = async () => {
+  const response = await fetch(
+    'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/points-apport-volontaire/records?where=code_carto%3D%22DA%22&limit=50'
+  )
+  const data = await response.json()
+  daBins.value = data.results
+    .filter((item: any) => item.geo_point_2d && typeof item.geo_point_2d.lat === "number" && typeof item.geo_point_2d.lon === "number")
+    .map((item: any) => ({
+      name: 'Poubelle déchets alimentaires',
+      lat: item.geo_point_2d.lat,
+      lon: item.geo_point_2d.lon
+    }))
+}
 
 const fetchComposts = async () => {
-  try {
-    loadingComposts.value = true
-    const res = await fetch('../public/data/composteurs-collectifs.json')
-    const arr = await res.json()
-    // Log la première entrée pour valider structure
-    console.log('COMPOSTS:', arr[0])
-    composts.value = arr
-  } catch (error) {
-    console.error('Erreur chargement composts:', error)
-    composts.value = []
-  } finally {
-    loadingComposts.value = false
-  }
+  const response = await fetch(
+    'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/composteurs-collectifs/records?limit=100'
+  )
+  const data = await response.json()
+  composts.value = data.results
+    .filter((item: any) => item.geo_point_2d && typeof item.geo_point_2d.lat === "number" && typeof item.geo_point_2d.lon === "number")
+    .map((item: any) => ({
+      name: 'Composteur',
+      lat: item.geo_point_2d.lat,
+      lon: item.geo_point_2d.lon
+    }))
 }
 
-const fetchDA = async () => {
-  try {
-    loadingDA.value = true
-    const res = await fetch('../public/data/points-apports-volontaire.json')
-    const arr = await res.json()
-    console.log('DA:', arr[0])
-    daBins.value = arr
-  } catch (error) {
-    console.error('Erreur chargement DA:', error)
-    daBins.value = []
-  } finally {
-    loadingDA.value = false
-  }
-}
+const sortedDaBins = computed(() =>
+  daBins.value
+    .map(item => ({
+      ...item,
+      formattedDistance: formatDistance(calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon))
+    }))
+    .sort((a, b) =>
+      calculateDistance(props.location.lat, props.location.lon, a.lat, a.lon) -
+      calculateDistance(props.location.lat, props.location.lon, b.lat, b.lon)
+    )
+    .slice(0, 2)
+)
 
-onMounted(() => {
-  fetchComposts()
-  fetchDA()
+const sortedComposts = computed(() =>
+  composts.value
+    .map(item => ({
+      ...item,
+      formattedDistance: formatDistance(calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon))
+    }))
+    .sort((a, b) =>
+      calculateDistance(props.location.lat, props.location.lon, a.lat, a.lon) -
+      calculateDistance(props.location.lat, props.location.lon, b.lat, b.lon)
+    )
+    .slice(0, 2)
+)
+
+const sortedWasteData = computed(() => [
+  ...sortedDaBins.value,
+  ...sortedComposts.value
+])
+
+onMounted(async () => {
+  loading.value = true
+  await Promise.all([fetchDaBins(), fetchComposts()])
+  loading.value = false
 })
 </script>
+
+<template>
+  <div class="category-card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+      </svg>
+      <h3>Déchets alimentaires</h3>
+      <p class="subtitle">Composts et poubelles</p>
+    </div>
+    <div class="card-content">
+      <div v-if="loading" class="loading">Chargement...</div>
+      <div v-else-if="sortedWasteData.length" class="items-list">
+        <div v-for="(item, idx) in sortedWasteData" :key="idx" class="item">
+          <div class="item-header"><h4>{{ item.name }}</h4></div>
+          <p class="item-detail"><span class="distance">{{ item.formattedDistance }}</span></p>
+        </div>
+      </div>
+    </div>
+    <button @click="$emit('show-map')" class="btn-more">Voir plus</button>
+  </div>
+</template>
+
 
 <style scoped>
 .category-card {
