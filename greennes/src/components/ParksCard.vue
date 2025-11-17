@@ -36,6 +36,11 @@
 <script setup lang="ts">
 import { ref, onMounted, defineProps, defineEmits, watch } from 'vue'
 import { calculateDistance, formatDistance } from '../utils/geoLocation'
+import type { Location } from '../types/location'
+
+const props = defineProps<{
+  location: Location
+}>()
 
 interface Park {
   name: string
@@ -46,11 +51,6 @@ interface Park {
   formattedDistance?: string
 }
 
-const props = defineProps({
-  location: String,
-  userLat: Number,
-  userLon: Number
-})
 
 const emit = defineEmits(['show-map'])
 
@@ -87,12 +87,12 @@ const prevSlide = () => {
   currentSlide.value = (currentSlide.value - 1 + parks.value.length) % parks.value.length
 }
 
-watch(() => [props.userLat, props.userLon], () => {
-  if (props.userLat && props.userLon) {
+watch(() => [props.location.lat, props.location.lon], () => {
+  if (props.location.lat && props.location.lon) {
     parks.value = parks.value.map(park => ({
       ...park,
       formattedDistance: park.lat && park.lon 
-        ? formatDistance(calculateDistance(props.userLat!, props.userLon!, park.lat, park.lon))
+        ? formatDistance(calculateDistance(props.location.lat!, props.location.lon!, park.lat, park.lon))
         : park.distance
     }))
   }

@@ -1,6 +1,5 @@
 <template>
   <div class="home-view">
-
     <!-- Search Bar -->
     <SearchBar @location-selected="handleLocationSelected" />
 
@@ -40,14 +39,21 @@ import ParksCard from '../components/ParksCard.vue'
 import AirQualitySection from '../components/AirQualitySection.vue'
 import RatingForm from '../components/RatingForm.vue'
 import MapModal from '../components/MapModal.vue'
+import type { Location } from '../types/location'
 
-const selectedLocation = ref('')
+const props = defineProps<{
+  location: Location
+}>()
+
+const selectedLocation = ref<Location | null>(null)
 const showMap = ref(false)
 const mapTitle = ref('')
 const mapItems = ref([])
 
-const handleLocationSelected = (location: string) => {
+const handleLocationSelected = (location: Location) => {
   selectedLocation.value = location
+  console.log('Location sélectionnée:', location)
+  // Vous pouvez maintenant accéder facilement à location.name, location.lat, location.lon
 }
 
 const showBikeMap = () => {

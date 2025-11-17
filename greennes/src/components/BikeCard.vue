@@ -1,20 +1,14 @@
 <template>
   <div class="category-card">
     <div class="card-header">
-      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="18" cy="17" r="3"></circle>
-        <circle cx="6" cy="17" r="3"></circle>
-        <path d="M4 6h16M4 12h16"></path>
-      </svg>
+      <FontAwesomeIcon :icon="['fas', 'bicycle']" class="card-icon" />
       <h3>Vélos</h3>
       <p class="subtitle">Location et stationnement</p>
     </div>
-
     <div class="card-content">
       <div v-if="loading" class="loading">Chargement...</div>
       <div v-else-if="sortedBikeData.length" class="items-list">
-        <!-- display sorted items with distance -->
-        <div v-for="(item, idx) in sortedBikeData.slice(0, 3)" :key="idx" class="item">
+        <div v-for="(item, idx) in sortedBikeData" :key="idx" class="item">
           <div class="item-header">
             <svg v-if="item.type === 'station'" class="item-icon" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="12" cy="12" r="9"></circle>
@@ -30,79 +24,108 @@
             <span class="distance">{{ item.formattedDistance }}</span>
           </p>
           <p class="item-detail" v-else>
-            disponibles : {{ item.available }}<br/>
+            emplacements : {{ item.capacity }}<br/>
+            <span v-if="item.couverture" class="info-badge">Couvert</span>
+            <span v-if="item.type_accroche" class="info-badge">{{ item.type_accroche }}</span>
+            <span v-if="item.protection" class="info-badge">{{ item.protection }}</span>
             <span class="distance">{{ item.formattedDistance }}</span>
           </p>
         </div>
       </div>
     </div>
-
     <button @click="$emit('show-map')" class="btn-more">Voir plus</button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineProps, defineEmits, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { calculateDistance, formatDistance } from '../utils/geoLocation'
+import type { Location } from '../types/location'
 
 interface BikeItem {
   name: string
   type: 'station' | 'parking'
-  available: number
+  available?: number
   capacity?: number
   lat: number
   lon: number
   distance?: number
   formattedDistance?: string
+  type_accroche?: string
+  couverture?: boolean
+  protection?: string
 }
 
-const props = defineProps({
-  location: String,
-  userLat: Number,
-  userLon: Number
-})
+const props = defineProps<{
+  location: Location
+}>()
 
 const emit = defineEmits(['show-map'])
 
 const loading = ref(true)
-const bikeData = ref<BikeItem[]>([])
+const stations = ref<BikeItem[]>([])
+const parkings = ref<BikeItem[]>([])
 
-const sortedBikeData = computed(() => {
-  if (!props.userLat || !props.userLon) return bikeData.value
-
-  return [...bikeData.value]
-    .map((item) => ({
+// Calculer les 2 stations et 1 parking les plus proches
+const sortedStations = computed(() =>
+  stations.value
+    .map(item => ({
       ...item,
-      distance: calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon),
-      formattedDistance: formatDistance(
-        calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon)
-      )
+      distance: calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon),
+      formattedDistance: formatDistance(calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon))
     }))
     .sort((a, b) => (a.distance || 0) - (b.distance || 0))
-})
+    .slice(0, 2)
+)
+const sortedParkings = computed(() =>
+  parkings.value
+    .map(item => ({
+      ...item,
+      distance: calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon),
+      formattedDistance: formatDistance(calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon))
+    }))
+    .sort((a, b) => (a.distance || 0) - (b.distance || 0))
+    .slice(0, 1)
+)
+const sortedBikeData = computed(() => [
+  ...sortedStations.value,
+  ...sortedParkings.value
+])
 
 const fetchBikeData = async () => {
   try {
     loading.value = true
-    const response = await fetch(
-      'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/etat-des-stations-le-velo-star-en-temps-reel/records?limit=10'
-    )
-    const data = await response.json()
-    
-    bikeData.value = data.results.map((station: any) => ({
-      name: station.nom_station,
+    // Stations (local JSON)
+    const stationsRes = await fetch('../public/data/stations-mock.json')
+    const stationsData = await stationsRes.json()
+    stations.value = stationsData.results.map((station: any) => ({
+      name: station.nom,
       type: 'station',
       available: station.nombrevelosdisponibles,
-      capacity: station.nombreemplacementsdisponibles,
+      capacity: station.nombreemplacementsactuels,
       lat: station.coordonnees.lat,
       lon: station.coordonnees.lon
     }))
+    // Parkings (local GeoJSON)
+    const parkingsRes = await fetch('../public/data/data.geojson')
+    const parkingsData = await parkingsRes.json()
+    parkings.value = parkingsData.features
+      .filter((f: any) => f.geometry && f.geometry.type === 'Point')
+      .map((feature: any) => ({
+        name: feature.properties?.nom || 'Parking vélo',
+        type: 'parking',
+        capacity: Number(feature.properties?.capacite) || 0,
+        lat: feature.geometry.coordinates[1], // GeoJSON: [lon, lat]
+        lon: feature.geometry.coordinates[0]
+      }))
   } catch (error) {
     console.error('Erreur chargement vélos:', error)
-    bikeData.value = [
-      { name: 'Station Sainte-Anne', type: 'station', available: 13, capacity: 13, lat: 48.1123, lon: -1.6789 },
-      { name: 'Station Hoche', type: 'station', available: 13, capacity: 13, lat: 48.1145, lon: -1.6756 },
-      { name: 'Parking Hoche', type: 'parking', available: 13, lat: 48.1140, lon: -1.6750, capacity: 0 }
+    stations.value = [
+      { name: 'Station Nulle', type: 'station', available: 13, capacity: 13, lat: 48.1123, lon: -1.6789 }
+    ]
+    parkings.value = [
+      { name: 'Parking Nul', type: 'parking', capacity: 8, lat: 48.114, lon: -1.675 }
     ]
   } finally {
     loading.value = false
