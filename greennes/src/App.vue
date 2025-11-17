@@ -12,5 +12,25 @@ import Footer from './components/Footer.vue'
 </script>
 
 <style>
+html, body, #app {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background: #FCF3DF;
+}
 
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+router-view, .home-view {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+}
 </style>
