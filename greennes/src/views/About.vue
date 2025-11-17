@@ -145,6 +145,10 @@ p {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.intro-section h2 {
+  margin-top: 0;
+}
+
 .intro-section p {
   font-size: 1.05rem;
 }
