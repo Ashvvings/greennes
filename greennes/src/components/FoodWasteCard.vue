@@ -18,7 +18,7 @@ const composts = ref<WasteItem[]>([])
 
 const fetchDaBins = async () => {
   const response = await fetch(
-    'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/points-apport-volontaire/records?where=code_carto%3D%22DA%22&limit=50'
+    'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/points-apport-volontaire/records?where=code_carto%3D%22DA%22&limit=100'
   )
   const data = await response.json()
   daBins.value = data.results
