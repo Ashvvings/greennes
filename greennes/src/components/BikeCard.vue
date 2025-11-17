@@ -42,8 +42,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineProps, defineEmits, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { calculateDistance, formatDistance } from '../utils/geoLocation'
+import type { Location } from '../types/location'
 
 interface BikeItem {
   name: string
@@ -56,11 +57,10 @@ interface BikeItem {
   formattedDistance?: string
 }
 
-const props = defineProps({
-  location: String,
-  userLat: Number,
-  userLon: Number
-})
+// Prop obligatoire sans '?'
+const props = defineProps<{
+  location: Location
+}>()
 
 const emit = defineEmits(['show-map'])
 
@@ -68,14 +68,13 @@ const loading = ref(true)
 const bikeData = ref<BikeItem[]>([])
 
 const sortedBikeData = computed(() => {
-  if (!props.userLat || !props.userLon) return bikeData.value
-
+  // props.location est garanti d'exister (pas de '?')
   return [...bikeData.value]
     .map((item) => ({
       ...item,
-      distance: calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon),
+      distance: calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon),
       formattedDistance: formatDistance(
-        calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon)
+        calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon)
       )
     }))
     .sort((a, b) => (a.distance || 0) - (b.distance || 0))

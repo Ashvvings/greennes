@@ -31,6 +31,11 @@
 <script setup lang="ts">
 import { ref, onMounted, defineProps, defineEmits, computed } from 'vue'
 import { calculateDistance, formatDistance } from '../utils/geoLocation'
+import type { Location } from '../types/location'
+
+const props = defineProps<{
+  location: Location
+}>()
 
 interface WasteItem {
   name: string
@@ -40,11 +45,6 @@ interface WasteItem {
   formattedDistance?: string
 }
 
-const props = defineProps({
-  location: String,
-  userLat: Number,
-  userLon: Number
-})
 
 const emit = defineEmits(['show-map'])
 
@@ -52,18 +52,18 @@ const loading = ref(true)
 const wasteData = ref<WasteItem[]>([])
 
 const sortedWasteData = computed(() => {
-  if (!props.userLat || !props.userLon) return wasteData.value
+  if (!props.location.lat || !props.location.lon) return wasteData.value
 
   return [...wasteData.value]
     .map((item) => ({
       ...item,
       formattedDistance: formatDistance(
-        calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon)
+        calculateDistance(props.location.lat!, props.location.lon!, item.lat, item.lon)
       )
     }))
     .sort((a, b) => {
-      const distA = calculateDistance(props.userLat!, props.userLon!, a.lat, a.lon)
-      const distB = calculateDistance(props.userLat!, props.userLon!, b.lat, b.lon)
+      const distA = calculateDistance(props.location.lat!, props.location.lon!, a.lat, a.lon)
+      const distB = calculateDistance(props.location.lat!, props.location.lon!, b.lat, b.lon)
       return distA - distB
     })
 })
