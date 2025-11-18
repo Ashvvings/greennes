@@ -2,20 +2,27 @@
   <div class="category-card">
     <div class="card-header">
       <FontAwesomeIcon :icon="['fas', 'bicycle']" class="card-icon" />
-      <h3>Vélos</h3>
-      <p class="subtitle">Location et stationnement</p>
+      <div class="header-content">
+        <h3>Vélos</h3>
+        <p class="subtitle">Location et stationnement</p>
+      </div>
     </div>
+
     <div class="card-content">
       <div v-if="loading" class="loading">Chargement...</div>
       <div v-else-if="sortedBikeData.length" class="items-list">
         <div v-for="(item, idx) in sortedBikeData" :key="idx" class="item">
           <div class="item-header">
-            <svg v-if="item.type === 'station'" class="item-icon" viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="12" cy="12" r="9"></circle>
-            </svg>
-            <svg v-else class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-            </svg>
+            <FontAwesomeIcon
+              v-if="item.type === 'parking'"
+              :icon="['fas', 'square-parking']"
+              class="item-icon"
+            />
+            <FontAwesomeIcon
+              v-else
+              :icon="['fas', 'credit-card']"
+              class="item-icon"
+            />
             <h4>{{ item.name }}</h4>
           </div>
           <p class="item-detail" v-if="item.type === 'station'">
@@ -25,9 +32,6 @@
           </p>
           <p class="item-detail" v-else>
             emplacements : {{ item.capacity }}<br/>
-            <span v-if="item.couverture" class="info-badge">Couvert</span>
-            <span v-if="item.type_accroche" class="info-badge">{{ item.type_accroche }}</span>
-            <span v-if="item.protection" class="info-badge">{{ item.protection }}</span>
             <span class="distance">{{ item.formattedDistance }}</span>
           </p>
         </div>
