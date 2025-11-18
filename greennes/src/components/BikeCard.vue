@@ -97,13 +97,14 @@ const sortedBikeData = computed(() => [
   ...sortedParkings.value
 ])
 
-const fetchBikeData = async () => {
-  try {
-    loading.value = true
-    // Stations (local JSON)
-    const stationsRes = await fetch('../public/data/stations-mock.json')
-    const stationsData = await stationsRes.json()
-    stations.value = stationsData.results.map((station: any) => ({
+//https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/etat-des-stations-le-velo-star-en-temps-reel/records?limit=60
+const fetchStations = async () => {
+  try{
+  const response = await fetch(
+    'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/etat-des-stations-le-velo-star-en-temps-reel/records?limit=60'
+  )
+  const data = await response.json()
+  stations.value = data.results.map((station: any) => ({
       name: station.nom,
       type: 'station',
       available: station.nombrevelosdisponibles,
@@ -111,6 +112,18 @@ const fetchBikeData = async () => {
       lat: station.coordonnees.lat,
       lon: station.coordonnees.lon
     }))
+  } catch (error) {
+    console.error('Erreur chargement stations :', error)
+    stations.value = [
+      { name: 'Station Nulle', type: 'station', available: 13, capacity: 13, lat: 48.1123, lon: -1.6789 }
+    ]
+  } finally {
+    loading.value = false
+  }
+}
+
+const fetchParkings = async () => {
+  try {
     // Parkings (local GeoJSON)
     const parkingsRes = await fetch('../public/data/data.geojson')
     const parkingsData = await parkingsRes.json()
@@ -124,10 +137,7 @@ const fetchBikeData = async () => {
         lon: feature.geometry.coordinates[0]
       }))
   } catch (error) {
-    console.error('Erreur chargement vélos:', error)
-    stations.value = [
-      { name: 'Station Nulle', type: 'station', available: 13, capacity: 13, lat: 48.1123, lon: -1.6789 }
-    ]
+    console.error('Erreur chargement parkings :', error)
     parkings.value = [
       { name: 'Parking Nul', type: 'parking', capacity: 8, lat: 48.114, lon: -1.675 }
     ]
@@ -136,8 +146,10 @@ const fetchBikeData = async () => {
   }
 }
 
-onMounted(() => {
-  fetchBikeData()
+onMounted(async () => {
+  loading.value = true
+  await Promise.all([fetchStations(), fetchParkings()])
+  loading.value = false
 })
 </script>
 
