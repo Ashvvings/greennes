@@ -17,7 +17,13 @@ html, body, #app {
   margin: 0;
   padding: 0;
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   background: #FCF3DF;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 #app {

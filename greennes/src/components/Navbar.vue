@@ -1,15 +1,16 @@
 <template>
   <nav class="navbar">
+    <img src="/src/assets/images/logoV2.png" alt="Logo" class="logo" />
+    
     <button class="hamburger" @click="isOpen = !isOpen">
       <span :class="{ open: isOpen }"></span>
       <span :class="{ open: isOpen }"></span>
       <span :class="{ open: isOpen }"></span>
     </button>
-
+    
     <div class="nav-links" :class="{ open: isOpen }">
       <router-link :to="{ path: '/' }" class="nav-link" @click="closeMenu">Accueil</router-link>
-      <router-link :to="{ path: '/', hash: '#air-quality' }" class="nav-link" @click="closeMenu">Qualité de
-        l'air</router-link>
+      <router-link :to="{ path: '/', hash: '#air-quality' }" class="nav-link" @click="closeMenu">Qualité de l'air</router-link>
       <router-link :to="{ path: '/', hash: '#comment' }" class="nav-link" @click="closeMenu">Commentaires</router-link>
       <router-link :to="{ path: '/about' }" class="nav-link" @click="closeMenu">Qui sommes-nous ?</router-link>
     </div>
@@ -37,6 +38,15 @@ const closeMenu = () => (isOpen.value = false)
   justify-content: center;
 }
 
+.logo {
+  position: absolute;
+  left: 1rem;
+  height: 40px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+}
+
 .nav-links {
   display: flex;
   gap: 2rem;
@@ -51,7 +61,7 @@ const closeMenu = () => (isOpen.value = false)
 }
 
 .nav-link:hover {
-  color: #0EA5A4;
+  color: #d4af8f;
 }
 
 .hamburger {
@@ -85,6 +95,13 @@ const closeMenu = () => (isOpen.value = false)
 @media (max-width: 768px) {
   .hamburger {
     display: flex;
+  }
+
+  .logo {
+    left: auto;
+    right: 1rem;
+    height: 35px;
+    max-width: 100px;
   }
 
   .navbar {
