@@ -12,34 +12,41 @@
       <div v-if="loading" class="loading">Chargement...</div>
       <div v-else-if="sortedBikeData.length" class="items-list">
         <div v-for="(item, idx) in sortedBikeData" :key="idx" class="item">
-          <div class="item-header">
-            <FontAwesomeIcon
-              v-if="item.type === 'parking'"
-              :icon="['fas', 'square-parking']"
-              class="item-icon"
-            />
-            <FontAwesomeIcon
-              v-else
-              :icon="['fas', 'credit-card']"
-              class="item-icon"
-            />
-            <h4>{{ item.name }}</h4>
+          <div class="item-main">
+            <div class="item-left">
+              <div class="item-header">
+                <FontAwesomeIcon
+                  v-if="item.type === 'parking'"
+                  :icon="['fas', 'square-parking']"
+                  class="item-icon"
+                />
+                <FontAwesomeIcon
+                  v-else
+                  :icon="['fas', 'credit-card']"
+                  class="item-icon"
+                />
+                <h4>{{ item.name }}</h4>
+              </div>
+              <div class="item-detail" v-if="item.type === 'station'">
+                disponibles : {{ item.available }}<br />
+                emplacements : {{ item.capacity }}
+              </div>
+              <div class="item-detail" v-else>
+                emplacements : {{ item.capacity }}
+              </div>
+            </div>
+            <div class="item-distance">
+              <span class="distance">{{ item.formattedDistance }}</span>
+            </div>
           </div>
-          <p class="item-detail" v-if="item.type === 'station'">
-            disponibles : {{ item.available }}<br/>
-            emplacements : {{ item.capacity }}<br/>
-            <span class="distance">{{ item.formattedDistance }}</span>
-          </p>
-          <p class="item-detail" v-else>
-            emplacements : {{ item.capacity }}<br/>
-            <span class="distance">{{ item.formattedDistance }}</span>
-          </p>
         </div>
       </div>
     </div>
+
     <button @click="$emit('show-map')" class="btn-more">Voir plus</button>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
@@ -170,6 +177,10 @@ onMounted(async () => {
   gap: 1rem;
 }
 
+.header-content {
+  flex: 1;
+}
+
 .card-icon {
   width: 32px;
   height: 32px;
@@ -204,12 +215,31 @@ onMounted(async () => {
 }
 
 .item {
-  padding: 0.75rem;
+  padding: 0.75rem 0.5rem;
   background-color: #F9F9F9;
   border-radius: 8px;
   border-left: 3px solid #D4AF8F;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Ligne principale, permet l'alignement gauche/droite */
+.item-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Partie gauche avec nom/détails */
+.item-left {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Icône et nom sur une ligne */
 .item-header {
   display: flex;
   align-items: center;
@@ -221,23 +251,39 @@ onMounted(async () => {
   width: 20px;
   height: 20px;
   color: #0EA5A4;
+  flex-shrink: 0;
 }
 
 .item-header h4 {
   margin: 0;
   font-size: 0.95rem;
   color: #1B0808;
+  word-break: break-word;
 }
 
+/* Détails disponibles/emplacements */
 .item-detail {
-  margin: 0.25rem 0 0 1.75rem;
+  margin: 0 0 0 1.75rem;
   font-size: 0.85rem;
   color: #666;
+  white-space: pre-line;
+}
+
+/* Partie droite, pour la distance à droite centrée */
+.item-distance {
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  padding-left: 1rem;
 }
 
 .distance {
   color: #0EA5A4;
   font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
 }
 
 .btn-more {
