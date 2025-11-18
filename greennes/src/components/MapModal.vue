@@ -21,6 +21,12 @@
 import { ref, watch, defineProps, defineEmits, nextTick, onUnmounted } from 'vue'
 import L from 'leaflet'
 
+const props = defineProps<{
+  isOpen: boolean
+  title?: string
+  items?: Item[]
+}>()
+
 type Item = {
   lat?: number
   lon?: number
@@ -28,12 +34,6 @@ type Item = {
   hours?: string
   available?: number
 }
-
-const props = defineProps<{
-  isOpen: boolean
-  title?: string
-  items?: Item[]
-}>()
 
 const emit = defineEmits(['close'])
 
