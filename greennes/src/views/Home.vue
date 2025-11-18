@@ -9,7 +9,7 @@
     <!-- Main Content Section -->
     <section v-if="selectedLocation" class="main-content" id="home-cards">
       <div class="container">
-        <h2>Infrastructures</h2>
+        <h2>Infrastructures à Rennes</h2>
         <div class="cards-grid">
           <BikeCard :location="selectedLocation" @show-map="showBikeMap" />
           <FoodWasteCard :location="selectedLocation" @show-map="showWasteMap" />
@@ -106,7 +106,7 @@ h2 {
 
 .main-content {
   background-color: #FCF3DF;
-  padding:4rem 0 2rem 0;
+  padding:3rem 0 2rem 0;
 }
 
 .container {

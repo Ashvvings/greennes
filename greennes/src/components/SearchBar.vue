@@ -142,6 +142,7 @@ const selectFromList = (label: string) => {
     <div class="intro-card">
       <h1 class="title">Bienvenue sur Grennes !</h1>
       <p class="lead">
+          Un site pour découvrir les infrastructures écologiques à <strong><span style="color:#0EA5A4">Rennes</span></strong>.
           Sur notre site, recherchez les infrastructures près de vous. Retrouvez vos stations
           de vélo, composteurs, parcs, etc. préférés. Entrez votre localisation dans la
           barre de recherche pour commencer.
@@ -190,7 +191,7 @@ const selectFromList = (label: string) => {
           >{{ suggestion }}</button>
         </div>
         <div v-if="hasSelectedLocation && selectedLocation" class="location-info">
-          <p>Voici les différents équipements et lieux à proximité de : <strong>{{ selectedLocation.name }}</strong></p>
+          <p>Voici les différentes infrastructures à proximité de : <strong>{{ selectedLocation.name }}</strong></p>
         </div>
       </div>
     </div>
@@ -206,7 +207,7 @@ const selectFromList = (label: string) => {
 
 .intro-card {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1135px;
     background: var(--card-bg, #ffffff);
     color: var(--text, #222);
     border-radius: 12px;

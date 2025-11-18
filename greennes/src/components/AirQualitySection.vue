@@ -87,12 +87,12 @@ onMounted(() => {
 <template>
   <section class="air-quality-section" id="air-quality">
     <div class="container">
-      <h2>Qualité de l'air</h2>
+      <h2>Qualité de l'air à Rennes</h2>
 
       <!-- Carte principale avec l'indice global -->
       <div class="main-card" :class="{ 'skeleton': loading }">
         <div class="aqi-label" :class="{ 'skeleton-text': loading }">
-          {{ loading ? '' : 'Indice global' }}
+          {{ loading ? '' : 'Indice global rennais' }}
         </div>
         <div class="aqi-circle" :class="[
           loading ? 'skeleton-circle' : (airData.indexLevel ? `index-${airData.indexLevel}` : '')
