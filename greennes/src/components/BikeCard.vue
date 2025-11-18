@@ -52,7 +52,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { calculateDistance, formatDistance } from '../utils/geoLocation'
-import type { Location } from '../types/location'
+import type { Location } from '../types/location.ts'
 
 interface BikeItem {
   name: string

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { calculateDistance, formatDistance } from '../utils/geoLocation'
-import type { Location } from '../types/location'
+import type { Location } from '../types/location.ts'
 
 const props = defineProps<{ location: Location }>()
 
