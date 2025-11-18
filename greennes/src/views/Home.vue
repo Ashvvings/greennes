@@ -91,39 +91,6 @@ const closeMapModal = () => {
   margin-top: 3rem;
 }
 
-.navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: #E8D5AA;
-  padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 999;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 2rem;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-center {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-}
-
-.nav-link {
-  color: #1B0808;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-  font-size: 0.95rem;
-}
-
-.nav-link:hover {
-  color: #0EA5A4;
-}
-
 .main-content {
   background-color: #FCF3DF;
   padding: 2rem 0;
@@ -133,29 +100,41 @@ const closeMapModal = () => {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 2rem;
 }
+
+/* -------- GRID DES CARTES -------- */
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-areas: 
+    "bike food park";
 }
 
+.cards-grid > :nth-child(1) { grid-area: bike; }
+.cards-grid > :nth-child(2) { grid-area: food; }
+.cards-grid > :nth-child(3) { grid-area: park; }
+
+/* ---- TABLET (2 lignes) ---- */
+@media (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "bike food"
+      "park park";
+  }
+}
+
+/* ---- MOBILE ---- */
 @media (max-width: 768px) {
-  .navbar {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-  }
-
-  .nav-center {
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-  }
-
   .cards-grid {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "bike"
+      "food"
+      "park";
   }
 }
 </style>
