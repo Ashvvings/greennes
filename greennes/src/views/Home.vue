@@ -1,7 +1,7 @@
 <template>
   <div class="home-view">
     <!-- Intro Section -->
-    <IntroSection id="intro" />
+    <!-- <IntroSection id="intro" /> -->
 
     <!-- Search Bar -->
     <SearchBar :location="selectedLocation ?? defaultLocation" @location-selected="handleLocationSelected" />

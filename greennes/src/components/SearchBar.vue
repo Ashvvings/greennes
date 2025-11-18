@@ -139,57 +139,108 @@ const selectFromList = (label: string) => {
 
 <template>
   <div class="search-section">
-    <div class="container">
-      <div class="search-container">
-        <div class="search-input-wrapper">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Rechercher un lieu à Rennes"
-            class="search-input"
-            @keyup.enter="performSearch"
-            @input="showSuggestions = true"
-            @focus="showSuggestions = true"
-            @blur="hideSuggestions"
-            autocomplete="off"
-          />
-          <div v-if="loading && !searchResultsMode && showSuggestions" class="loading-spinner">Chargement…</div>
-          <div v-if="showSuggestions && suggestions.length > 0 && !searchResultsMode" class="suggestions-dropdown">
-            <button
-              v-for="(suggestion, idx) in suggestions"
-              :key="idx"
-              class="suggestion-item"
-              @mousedown.prevent="selectSuggestion(suggestion)"
-            >{{ suggestion }}</button>
+    <div class="intro-card">
+      <h1 class="title">Bienvenue sur Grennes !</h1>
+      <p class="lead">
+          Sur notre site, recherchez les infrastructures près de vous. Retrouvez vos stations
+          de vélo, composteurs, parcs, etc. préférés. Entrez votre localisation dans la
+          barre de recherche pour commencer.
+      </p>
+      <div class="container">
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Rechercher un lieu à Rennes"
+              class="search-input"
+              @keyup.enter="performSearch"
+              @input="showSuggestions = true"
+              @focus="showSuggestions = true"
+              @blur="hideSuggestions"
+              autocomplete="off"
+            />
+            <div v-if="loading && !searchResultsMode && showSuggestions" class="loading-spinner">Chargement…</div>
+            <div v-if="showSuggestions && suggestions.length > 0 && !searchResultsMode" class="suggestions-dropdown">
+              <button
+                v-for="(suggestion, idx) in suggestions"
+                :key="idx"
+                class="suggestion-item"
+                @mousedown.prevent="selectSuggestion(suggestion)"
+              >{{ suggestion }}</button>
+            </div>
           </div>
+          <button @click="performSearch" class="search-button">Rechercher</button>
         </div>
-        <button @click="performSearch" class="search-button">Rechercher</button>
-      </div>
-      <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
-      <div v-if="searchResultsMode && suggestions.length > 0 && !hasSelectedLocation && !selectedLocation" class="autocomplete-title">
-        Sélectionnez un des lieux qui correspondent à : "<strong>{{ lastSearched }}</strong>".
-      </div>
+        <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
+        <div v-if="searchResultsMode && suggestions.length > 0 && !hasSelectedLocation && !selectedLocation" class="autocomplete-title">
+          Sélectionnez un des lieux qui correspondent à : "<strong>{{ lastSearched }}</strong>".
+        </div>
 
-      <div v-if="searchResultsMode && suggestions.length > 0 && !hasSelectedLocation && !selectedLocation" class="suggestions-underbar">
-        <button
-          v-for="(suggestion, idx) in suggestions"
-          :key="idx"
-          class="suggestion-item"
-          @click="selectFromList(suggestion)"
-        >{{ suggestion }}</button>
-      </div>
-      <div v-if="hasSelectedLocation && selectedLocation" class="location-info">
-        <p>Voici les différents équipements et lieux à proximité de : <strong>{{ selectedLocation.name }}</strong></p>
+        <div v-if="searchResultsMode && suggestions.length > 0 && !hasSelectedLocation && !selectedLocation" class="suggestions-underbar">
+          <button
+            v-for="(suggestion, idx) in suggestions"
+            :key="idx"
+            class="suggestion-item"
+            @click="selectFromList(suggestion)"
+          >{{ suggestion }}</button>
+        </div>
+        <div v-if="hasSelectedLocation && selectedLocation" class="location-info">
+          <p>Voici les différents équipements et lieux à proximité de : <strong>{{ selectedLocation.name }}</strong></p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.search-section {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.intro-card {
+    width: 100%;
+    max-width: 1200px;
+    background: var(--card-bg, #ffffff);
+    color: var(--text, #222);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: var(--card-shadow, 0 6px 18px rgba(0, 0, 0, 0.06));
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.75rem;
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+.lead {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--muted, #4b5563);
+}
+
+@media (max-width: 600px) {
+    .intro-card {
+        padding: 1rem;
+        border-radius: 10px;
+    }
+    .title {
+        font-size: 1.4rem;
+    }
+}
+
+
+
 .loading-spinner {
   position: absolute;
   right: 16px;
@@ -234,14 +285,14 @@ const selectFromList = (label: string) => {
   color: #000;
 }
 .search-section {
-  background-color: white;
-  padding: 1.5rem 0 0.5rem 0;
+  background-color: #FCF3DF;
+  padding: 1.5rem 0 1.5rem 0;
 }
-.container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; margin-top: 1rem;}
 .search-container { display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap; }
-.search-input-wrapper { display: flex; align-items: center; background-color: white; border-radius: 8px; padding: 0.75rem 1rem; flex: 1; min-width: 0; max-width: 500px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); position: relative; }
-.search-icon { width: 20px; height: 20px; color: #999; margin-right: 0.5rem; flex-shrink: 0; }
-.search-input { border: none; outline: none; width: 100%; font-size: 1rem; font-family: 'Inter', sans-serif; }
+.search-input-wrapper { display: flex; align-items: center; background-color: #F9F9F9; border-radius: 8px; padding: 0.75rem 1rem; flex: 1; min-width: 0; max-width: 500px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); position: relative; }
+.search-icon { width: 20px; height: 20px; color: #807d71; margin-right: 0.5rem; flex-shrink: 0; }
+.search-input { border: none; outline: none; width: 100%; font-size: 1rem; font-family: 'Inter', sans-serif; background-color: #F9F9F9;}
 .suggestions-dropdown { position: absolute; top: 100%; left: 0; right: 0; background-color: white; border: 1px solid #E0E0E0; border-top: none; border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
 .suggestion-item { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border: none; background: none; text-align: left; cursor: pointer; transition: background-color 0.2s; font-size: 0.9rem; color: #333; }
 .suggestion-item:hover { background-color: #F5F5F5; }
