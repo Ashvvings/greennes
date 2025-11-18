@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import { ref, defineEmits, watch } from 'vue'
 import { debounce } from 'lodash'
+import type { Location } from '../types/location'
+
+const props = defineProps<{
+  location: Location
+}>()
 
 const searchQuery = ref('')
-const selectedLocation = ref('')
+const selectedLocation = ref<Location | null>(null)
 const suggestions = ref<string[]>([])
 const showSuggestions = ref(false)
 const loading = ref(false)
 const errorMsg = ref('')
 const searchResultsMode = ref(false)
 const hasSelectedLocation = ref(false)
-const emit = defineEmits(['location-selected'])
+const emit = defineEmits<{
+  'location-selected': [location: Location]
+}>()
 const lastSearched = ref('')
 const showAutocompleteResults = ref(false)
 
@@ -56,7 +63,7 @@ const debouncedFetchSuggestions = debounce(async () => {
       }
       let combined = mainLabel.trim()
       if (streetLabel) {
-        if (combined) combined += ` – ${streetLabel}`
+        if (combined) combined += ` — ${streetLabel}`
         else combined = streetLabel
       }
       if (!combined) combined = item.display_name
@@ -92,14 +99,15 @@ const selectSuggestion = async (query: string) => {
     )
     const data = await response.json()
     if (data.length > 0) {
-      selectedLocation.value = query
-      hasSelectedLocation.value = true
-      searchQuery.value = ''
-      emit('location-selected', {
+      const locationData: Location = {
         name: query,
         lat: parseFloat(data[0].lat),
         lon: parseFloat(data[0].lon)
-      })
+      }
+      selectedLocation.value = locationData
+      hasSelectedLocation.value = true
+      searchQuery.value = ''
+      emit('location-selected', locationData)
     }
   } catch (error) {
     errorMsg.value = "Impossible de récupérer la localisation sélectionnée."
@@ -110,7 +118,7 @@ const performSearch = async () => {
   errorMsg.value = ''
   searchResultsMode.value = false
   hasSelectedLocation.value = false
-  selectedLocation.value = ''
+  selectedLocation.value = null
   if (searchQuery.value.trim()) {
     await debouncedFetchSuggestions.flush?.()
     if (!suggestions.value.length) {
@@ -127,8 +135,6 @@ const performSearch = async () => {
 const selectFromList = (label: string) => {
   selectSuggestion(label)
 }
-
-
 </script>
 
 <template>
@@ -151,9 +157,7 @@ const selectFromList = (label: string) => {
             @blur="hideSuggestions"
             autocomplete="off"
           />
-          <!-- Loading classique (pendant fetch suggestions/autocomplete uniquement) -->
           <div v-if="loading && !searchResultsMode && showSuggestions" class="loading-spinner">Chargement…</div>
-          <!-- Autocomplétion classique dropdown = suggestions sur frappe -->
           <div v-if="showSuggestions && suggestions.length > 0 && !searchResultsMode" class="suggestions-dropdown">
             <button
               v-for="(suggestion, idx) in suggestions"
@@ -165,13 +169,11 @@ const selectFromList = (label: string) => {
         </div>
         <button @click="performSearch" class="search-button">Rechercher</button>
       </div>
-      <!-- Bloc d'erreur sous la barre -->
       <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
       <div v-if="searchResultsMode && suggestions.length > 0 && !hasSelectedLocation && !selectedLocation" class="autocomplete-title">
-      Sélectionnez un des lieux qui correspondent à : "<strong>{{ lastSearched }}</strong>".
+        Sélectionnez un des lieux qui correspondent à : "<strong>{{ lastSearched }}</strong>".
       </div>
 
-      <!-- Liste des résultats fixés sous la barre visible uniquement après recherche -->
       <div v-if="searchResultsMode && suggestions.length > 0 && !hasSelectedLocation && !selectedLocation" class="suggestions-underbar">
         <button
           v-for="(suggestion, idx) in suggestions"
@@ -181,7 +183,7 @@ const selectFromList = (label: string) => {
         >{{ suggestion }}</button>
       </div>
       <div v-if="hasSelectedLocation && selectedLocation" class="location-info">
-        <p>Voici les différents équipements et lieux à proximité de : <strong>{{ selectedLocation }}</strong></p>
+        <p>Voici les différents équipements et lieux à proximité de : <strong>{{ selectedLocation.name }}</strong></p>
       </div>
     </div>
   </div>
@@ -205,21 +207,21 @@ const selectFromList = (label: string) => {
   margin-top: 0.4rem;
   display: flex;
   flex-direction: column;
-  gap: 0.12rem;           /* faible espace entre boutons */
-  background: transparent; /* pas de fond global */
-  align-items: flex-start; /* boutons alignés à gauche */
+  gap: 0.12rem;
+  background: transparent;
+  align-items: flex-start;
   padding: 0;
 }
 .suggestions-underbar .suggestion-item {
-  background: #fff;                 /* fond blanc interne */
-  border: 1.2px solid #C9A17A;      /* contour couleur demandée */
-  color: #000;                      /* texte noir */
+  background: #fff;
+  border: 1.2px solid #C9A17A;
+  color: #000;
   font-size: 1rem;
   text-align: left;
   cursor: pointer;
   border-radius: 7px;
-  margin: 0.08rem 0;                /* petite marge verticale */
-  padding: 0.38rem 0.8rem;          /* bouton compact */
+  margin: 0.08rem 0;
+  padding: 0.38rem 0.8rem;
   transition: background 0.13s, color 0.13s, border 0.13s;
   box-shadow: none;
   width: auto;
@@ -228,8 +230,8 @@ const selectFromList = (label: string) => {
   display: block;
 }
 .suggestions-underbar .suggestion-item:hover {
-  background: #C9A17A;              /* fond marron bouton search au survol */
-  color: #000;                      /* texte noir sur survol aussi */
+  background: #C9A17A;
+  color: #000;
 }
 .search-section {
   background-color: #FCF3DF;
@@ -237,14 +239,14 @@ const selectFromList = (label: string) => {
 }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
 .search-container { display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap; }
-.search-input-wrapper { display: flex; align-items: center; background-color: white; border-radius: 8px; padding: 0.75rem 1rem; flex: 1; max-width: 500px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); position: relative; }
+.search-input-wrapper { display: flex; align-items: center; background-color: white; border-radius: 8px; padding: 0.75rem 1rem; flex: 1; min-width: 0; max-width: 500px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); position: relative; }
 .search-icon { width: 20px; height: 20px; color: #999; margin-right: 0.5rem; flex-shrink: 0; }
 .search-input { border: none; outline: none; width: 100%; font-size: 1rem; font-family: 'Inter', sans-serif; }
 .suggestions-dropdown { position: absolute; top: 100%; left: 0; right: 0; background-color: white; border: 1px solid #E0E0E0; border-top: none; border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
 .suggestion-item { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border: none; background: none; text-align: left; cursor: pointer; transition: background-color 0.2s; font-size: 0.9rem; color: #333; }
 .suggestion-item:hover { background-color: #F5F5F5; }
 .location-icon { width: 16px; height: 16px; color: #D4AF8F; flex-shrink: 0; }
-.search-button { background-color: #D4AF8F; color: #1B0808; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 500; transition: background-color 0.3s; white-space: nowrap; font-size: 1rem; }
+.search-button { background-color: #D4AF8F; color: #1B0808; border: none; padding: 0.75rem 1.25rem; border-radius: 8px; cursor: pointer; font-weight: 500; transition: background-color 0.3s; white-space: nowrap; font-size: 1rem; }
 .search-button:hover { background-color: #C9A17A; }
 .location-info { margin-top: 1rem; text-align: center; font-size: 1rem; color: #333; }
 .location-info strong { color: #1B0808; font-weight: 600; }
@@ -267,13 +269,11 @@ const selectFromList = (label: string) => {
 @media (max-width: 480px) {
   .search-section { padding: 0.75rem 0; }
   .container { padding: 0 0.5rem; }
-  .search-container { flex-direction: column; gap: 0.5rem; }
-  .search-input-wrapper { max-width: 100%; padding: 0.6rem 0.8rem; }
+  .search-container { flex-direction: row; gap: 0.5rem; align-items: stretch; }
+  .search-input-wrapper { flex: 1; min-width: 0; max-width: none; padding: 0.6rem 0.8rem; }
   .search-icon { width: 18px; height: 18px; margin-right: 0.3rem; }
   .search-input { font-size: 16px; }
-  .search-button { width: 100%; padding: 0.6rem 1rem; font-size: 0.9rem; }
+  .search-button { padding: 0.6rem 0.9rem; font-size: 0.9rem; flex-shrink: 0; }
   .location-info { font-size: 0.8rem; margin-top: 0.5rem; }
 }
-
-
 </style>

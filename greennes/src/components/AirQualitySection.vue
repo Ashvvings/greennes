@@ -213,60 +213,49 @@ onMounted(() => {
             </template>
           </h3>
 
-          <div class="data-row" :class="{ 'skeleton-row': loading }">
-            <span class="data-label" :class="{ 'skeleton-text': loading }">
-              <template v-if="!loading">
-                Température
-                <div class="info-tooltip">
-                  <span class="info-icon">ℹ</span>
-                  <div class="tooltip-text">Température actuelle de l'air en degrés Celsius</div>
-                </div>
-              </template>
-            </span>
-            <span class="data-value" :class="{ 'skeleton-text': loading }">
-              <template v-if="!loading">
-                {{ airData.temperature !== null ? airData.temperature : 'N/A' }}
-                <span class="data-unit">°C</span>
-              </template>
-            </span>
+          <div class="particule-row" :class="{ 'skeleton-row': loading }">
+            <div class="data-content">
+              <span class="data-label" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">Température
+                  <div class="info-tooltip"><span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Température en °C</div></div>
+                </template>
+              </span>
+              <span class="data-value" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">{{ airData.temperature ?? 'N/A' }}<span class="data-unit">°C</span></template>
+              </span>
+            </div>
           </div>
 
-          <div class="data-row" :class="{ 'skeleton-row': loading }">
-            <span class="data-label" :class="{ 'skeleton-text': loading }">
-              <template v-if="!loading">
-                Humidité relative
-                <div class="info-tooltip">
-                  <span class="info-icon">ℹ</span>
-                  <div class="tooltip-text">Pourcentage d'humidité dans l'air</div>
-                </div>
-              </template>
-            </span>
-            <span class="data-value" :class="{ 'skeleton-text': loading }">
-              <template v-if="!loading">
-                {{ airData.humidity !== null ? airData.humidity : 'N/A' }}
-                <span class="data-unit">%</span>
-              </template>
-            </span>
+          <div class="particule-row" :class="{ 'skeleton-row': loading }">
+            <div class="data-content">
+              <span class="data-label" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">Humidité relative
+                  <div class="info-tooltip"><span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Pourcentage d'humidité</div></div>
+                </template>
+              </span>
+              <span class="data-value" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">{{ airData.humidity ?? 'N/A' }}<span class="data-unit">%</span></template>
+              </span>
+            </div>
           </div>
 
-          <div class="data-row" :class="{ 'skeleton-row': loading }">
-            <span class="data-label" :class="{ 'skeleton-text': loading }">
-              <template v-if="!loading">
-                Pression atmosphérique
-                <div class="info-tooltip">
-                  <span class="info-icon">ℹ</span>
-                  <div class="tooltip-text">Pression de l'air en hectopascals</div>
-                </div>
-              </template>
-            </span>
-            <span class="data-value" :class="{ 'skeleton-text': loading }">
-              <template v-if="!loading">
-                {{ airData.pressure !== null ? airData.pressure : 'N/A' }}
-                <span class="data-unit">hPa</span>
-              </template>
-            </span>
+          <div class="particule-row" :class="{ 'skeleton-row': loading }">
+            <div class="data-content">
+              <span class="data-label" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">Pression atmosphérique
+                  <div class="info-tooltip"><span class="info-icon">ℹ</span>
+                    <div class="tooltip-text">Pression en hPa</div></div>
+                </template>
+              </span>
+              <span class="data-value" :class="{ 'skeleton-text': loading }">
+                <template v-if="!loading">{{ airData.pressure ?? 'N/A' }}<span class="data-unit">hPa</span></template>
+              </span>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -278,7 +267,7 @@ onMounted(() => {
 }
 
 .air-quality-section {
-  background-color: #FCF3DF;
+  background-color: white;
   padding: 3rem 0;
 }
 
@@ -299,7 +288,7 @@ h2 {
 
 /* Carte principale de l'indice */
 .main-card {
-  background: white;
+  background: #FCF3DF;
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -308,8 +297,8 @@ h2 {
 }
 
 .aqi-circle {
-  width: 140px;
-  height: 140px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -319,7 +308,7 @@ h2 {
 }
 
 .aqi-value {
-  font-size: 3.5rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #2d3748;
 }
@@ -394,7 +383,7 @@ h2 {
 }
 
 .card {
-  background: white;
+  background: #FCF3DF;
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -448,7 +437,7 @@ h2 {
 
 /* Style pour les particules */
 .particule-row {
-  background: #f7fafc;
+  background: rgb(255, 255, 255);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 0.75rem;
@@ -608,12 +597,12 @@ h2 {
   }
 
   .aqi-circle {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
   }
 
   .aqi-value {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .data-label {

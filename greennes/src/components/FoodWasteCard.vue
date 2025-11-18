@@ -1,102 +1,109 @@
-<template>
-  <div class="category-card">
-    <div class="card-header">
-      <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-      </svg>
-      <h3>Déchets alimentaires</h3>
-      <p class="subtitle">Composts et poubelles</p>
-    </div>
-
-    <div class="card-content">
-      <div v-if="loading" class="loading">Chargement...</div>
-      <div v-else-if="sortedWasteData.length" class="items-list">
-        <!-- display sorted items with distance -->
-        <div v-for="(item, idx) in sortedWasteData.slice(0, 3)" :key="idx" class="item">
-          <div class="item-header">
-            <h4>{{ item.name }}</h4>
-          </div>
-          <p class="item-detail">
-            {{ item.distance }}<br/>
-            <span class="distance" v-if="item.formattedDistance">{{ item.formattedDistance }}</span>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <button @click="$emit('show-map')" class="btn-more">Voir plus</button>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, onMounted, defineProps, defineEmits, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { calculateDistance, formatDistance } from '../utils/geoLocation'
+import type { Location } from '../types/location'
+
+const props = defineProps<{ location: Location }>()
 
 interface WasteItem {
   name: string
-  distance: string
   lat: number
   lon: number
   formattedDistance?: string
 }
 
-const props = defineProps({
-  location: String,
-  userLat: Number,
-  userLon: Number
-})
-
-const emit = defineEmits(['show-map'])
-
 const loading = ref(true)
-const wasteData = ref<WasteItem[]>([])
+const daBins = ref<WasteItem[]>([])
+const composts = ref<WasteItem[]>([])
 
-const sortedWasteData = computed(() => {
-  if (!props.userLat || !props.userLon) return wasteData.value
-
-  return [...wasteData.value]
-    .map((item) => ({
-      ...item,
-      formattedDistance: formatDistance(
-        calculateDistance(props.userLat!, props.userLon!, item.lat, item.lon)
-      )
+const fetchDaBins = async () => {
+  const response = await fetch(
+    'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/points-apport-volontaire/records?where=code_carto%3D%22DA%22&limit=100'
+  )
+  const data = await response.json()
+  daBins.value = data.results
+    .filter((item: any) => item.geo_point_2d && typeof item.geo_point_2d.lat === "number" && typeof item.geo_point_2d.lon === "number")
+    .map((item: any) => ({
+      name: 'Poubelle déchets alimentaires',
+      lat: item.geo_point_2d.lat,
+      lon: item.geo_point_2d.lon
     }))
-    .sort((a, b) => {
-      const distA = calculateDistance(props.userLat!, props.userLon!, a.lat, a.lon)
-      const distB = calculateDistance(props.userLat!, props.userLon!, b.lat, b.lon)
-      return distA - distB
-    })
-})
-
-const fetchWasteData = async () => {
-  try {
-    loading.value = true
-    const response = await fetch(
-      'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/composteurs-collectifs/records?limit=10'
-    )
-    const data = await response.json()
-    
-    wasteData.value = data.results.map((item: any) => ({
-      name: item.nom || 'Composteur',
-      distance: item.adresse || 'Rennes',
-      lat: item.coordonnees?.lat,
-      lon: item.coordonnees?.lon
-    }))
-  } catch (error) {
-    console.error('Erreur chargement déchets:', error)
-    wasteData.value = [
-      { name: '3 composts à proximité', distance: '(10m, 45m, 200m)', lat: 48.1173, lon: -1.6778 },
-      { name: '2 poubelles de déchets alimentaires', distance: '(15m, 60m)', lat: 48.1180, lon: -1.6800 }
-    ]
-  } finally {
-    loading.value = false
-  }
 }
 
-onMounted(() => {
-  fetchWasteData()
+const fetchComposts = async () => {
+  const response = await fetch(
+    'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/composteurs-collectifs/records?limit=100'
+  )
+  const data = await response.json()
+  composts.value = data.results
+    .filter((item: any) => item.geo_point_2d && typeof item.geo_point_2d.lat === "number" && typeof item.geo_point_2d.lon === "number")
+    .map((item: any) => ({
+      name: 'Composteur',
+      lat: item.geo_point_2d.lat,
+      lon: item.geo_point_2d.lon
+    }))
+}
+
+const sortedDaBins = computed(() =>
+  daBins.value
+    .map(item => ({
+      ...item,
+      formattedDistance: formatDistance(calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon))
+    }))
+    .sort((a, b) =>
+      calculateDistance(props.location.lat, props.location.lon, a.lat, a.lon) -
+      calculateDistance(props.location.lat, props.location.lon, b.lat, b.lon)
+    )
+    .slice(0, 2)
+)
+
+const sortedComposts = computed(() =>
+  composts.value
+    .map(item => ({
+      ...item,
+      formattedDistance: formatDistance(calculateDistance(props.location.lat, props.location.lon, item.lat, item.lon))
+    }))
+    .sort((a, b) =>
+      calculateDistance(props.location.lat, props.location.lon, a.lat, a.lon) -
+      calculateDistance(props.location.lat, props.location.lon, b.lat, b.lon)
+    )
+    .slice(0, 2)
+)
+
+const sortedWasteData = computed(() => [
+  ...sortedDaBins.value,
+  ...sortedComposts.value
+])
+
+onMounted(async () => {
+  loading.value = true
+  await Promise.all([fetchDaBins(), fetchComposts()])
+  loading.value = false
 })
 </script>
+
+<template>
+  <div class="category-card">
+    <div class="card-header">
+      <FontAwesomeIcon :icon="['fas', 'recycle']" class="card-icon" />
+      <div class="header-content">
+        <h3>Déchets alimentaires</h3>
+        <p class="subtitle">Composts et poubelles</p>
+      </div>
+    </div>
+    <div class="card-content">
+      <div v-if="loading" class="loading">Chargement...</div>
+      <div v-else-if="sortedWasteData.length" class="items-list">
+        <div v-for="(item, idx) in sortedWasteData" :key="idx" class="item">
+          <div class="item-header"><h4>{{ item.name }}</h4></div>
+          <p class="item-detail"><span class="distance">{{ item.formattedDistance }}</span></p>
+        </div>
+      </div>
+    </div>
+    <button @click="$emit('show-map')" class="btn-more">Voir plus</button>
+  </div>
+</template>
+
 
 <style scoped>
 .category-card {
@@ -136,23 +143,32 @@ onMounted(() => {
 
 .card-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+}
+
+.items-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.item {
+  background-color: #F9F9F9;
+  border-radius: 8px;
+  border-left: 3px solid #D4AF8F;
+  padding: 0.75rem;
+  flex: 1 1 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .loading, .items-list {
   min-height: 80px;
-}
-
-.items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.item {
-  padding: 0.75rem;
-  background-color: #F9F9F9;
-  border-radius: 8px;
-  border-left: 3px solid #D4AF8F;
 }
 
 .item-header h4 {

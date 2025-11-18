@@ -21,9 +21,9 @@
           <a href="https://www.linkedin.com/in/alice-caroline-lombard" target="_blank">
             <div class="team-member">
               <img src="../assets/images/alice.png" alt="Image Alice Lombard">
-              <container class="name">
+              <div class="member-name">
                 <h3>Alice Lombard</h3>
-              </container>
+              </div>
               <p class="member-role">Développeuse Fullstack</p>
               <p class="member-bio">Étudiante à l'INSA Rennes</p>
             </div>
@@ -32,7 +32,9 @@
           <a href="https://www.linkedin.com/in/axelle-briens-solignac-b84836220/" target="_blank">
             <div class="team-member">
               <img src="../assets/images/axelle.png" alt="Image Axelle Briens-Solignac">
-              <h3>Axelle Briens-Solignac</h3>
+              <div class="member-name">
+                <h3>Axelle Briens-Solignac</h3>
+              </div>
               <p class="member-role">Développeuse Fullstack</p>
               <p class="member-bio">Étudiante à l'INSA Rennes</p>
             </div>
@@ -41,7 +43,9 @@
           <a href="https://www.linkedin.com/in/maud-marchal-bb837b4/" target="_blank">
             <div class="team-member">
               <img src="../assets/images/maud.png" alt="Image Maud Marchal">
-              <h3>Maud Marchal</h3>
+              <div class="member-name">
+                <h3>Maud Marchal</h3>
+              </div>
               <p class="member-role">Encadrante de projet</p>
               <p class="member-bio">Enseignante chercheuse à l'INSA Rennes</p>
             </div>
@@ -50,7 +54,9 @@
           <a href="https://www.linkedin.com/in/nicolo-cavalli/" target="_blank">
             <div class="team-member">
               <img src="../assets/images/nicolo.png" alt="Image Nicolo Cavalli">
-              <h3>Nicolo Cavalli</h3>
+              <div class="member-name">
+                <h3>Nicolo Cavalli</h3>
+              </div>
               <p class="member-role">Encadrant de projet</p>
               <p class="member-bio">Doctorant à l'INRIA et intervenant à l'INSA Rennes</p>
             </div>
@@ -139,6 +145,10 @@ p {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.intro-section h2 {
+  margin-top: 0;
+}
+
 .intro-section p {
   font-size: 1.05rem;
 }
@@ -189,6 +199,19 @@ p {
   margin: 0 auto 1rem auto;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.team-member h3 {
+  margin: 0; /* on centre via le conteneur */
+}
+
+.member-name {
+  min-height: 2.5em; 
+  display: flex;
+  align-items: center;   
+  justify-content: center;
+  margin: 0.5rem 0;
+  min-height: 3.5em;
 }
 
 .name {

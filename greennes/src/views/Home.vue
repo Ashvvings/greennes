@@ -1,12 +1,12 @@
 <template>
   <div class="home-view">
-
     <!-- Search Bar -->
-    <SearchBar @location-selected="handleLocationSelected" />
+    <SearchBar :location="selectedLocation ?? defaultLocation" @location-selected="handleLocationSelected" />
 
     <!-- Main Content Section -->
     <section v-if="selectedLocation" class="main-content" id="home-cards">
       <div class="container">
+        <h2>Infrastructures</h2>
         <div class="cards-grid">
           <BikeCard :location="selectedLocation" @show-map="showBikeMap" />
           <FoodWasteCard :location="selectedLocation" @show-map="showWasteMap" />
@@ -16,10 +16,10 @@
     </section>
 
     <!-- Air Quality Section -->
-    <AirQualitySection />
+    <AirQualitySection id="air-quality" />
 
     <!-- Rating Form Section -->
-    <RatingForm />
+    <RatingForm id="comment" />
 
     <!-- Map Modal -->
     <MapModal
@@ -40,14 +40,29 @@ import ParksCard from '../components/ParksCard.vue'
 import AirQualitySection from '../components/AirQualitySection.vue'
 import RatingForm from '../components/RatingForm.vue'
 import MapModal from '../components/MapModal.vue'
+import type { Location } from '../types/location'
 
-const selectedLocation = ref('')
+const props = defineProps<{
+  location: Location
+}>()
+
+const selectedLocation = ref<Location | null>(null)
+
+// default location object to satisfy SearchBar's required prop typing before a real selection is made
+const defaultLocation: Location = {
+  name: '',
+  lat: 0,
+  lon: 0
+}
+
 const showMap = ref(false)
 const mapTitle = ref('')
 const mapItems = ref([])
 
-const handleLocationSelected = (location: string) => {
+const handleLocationSelected = (location: Location) => {
   selectedLocation.value = location
+  console.log('Location sélectionnée:', location)
+  // Vous pouvez maintenant accéder facilement à location.name, location.lat, location.lon
 }
 
 const showBikeMap = () => {
@@ -71,41 +86,18 @@ const closeMapModal = () => {
 </script>
 
 <style scoped>
+
+h2 {
+  text-align: center;
+  color: #2d3748;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
 .home-view {
   width: 100%;
-}
-
-.navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: #E8D5AA;
-  padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 999;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 2rem;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-center {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-}
-
-.nav-link {
-  color: #1B0808;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-  font-size: 0.95rem;
-}
-
-.nav-link:hover {
-  color: #0EA5A4;
+  margin-top: 3rem;
 }
 
 .main-content {
@@ -117,29 +109,32 @@ const closeMapModal = () => {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 2rem;
 }
+
+/* -------- GRID DES CARTES -------- */
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+      "bike food"
+      "park park";
 }
 
+.cards-grid > :nth-child(1) { grid-area: bike; }
+.cards-grid > :nth-child(2) { grid-area: food; }
+.cards-grid > :nth-child(3) { grid-area: park; }
+
+/* ---- MOBILE ---- */
 @media (max-width: 768px) {
-  .navbar {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-  }
-
-  .nav-center {
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-  }
-
   .cards-grid {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "bike"
+      "food"
+      "park";
   }
 }
 </style>
