@@ -308,8 +308,8 @@ h2 {
 }
 
 .aqi-circle {
-  width: 140px;
-  height: 140px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -319,7 +319,7 @@ h2 {
 }
 
 .aqi-value {
-  font-size: 3.5rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #2d3748;
 }
@@ -608,12 +608,12 @@ h2 {
   }
 
   .aqi-circle {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
   }
 
   .aqi-value {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .data-label {
