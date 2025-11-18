@@ -100,8 +100,15 @@ const errors = reactive({
 </script>
 
 <style scoped>
+h2 {
+  text-align: center;
+  color: #2d3748;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
 .rating-section {
-  background-color: white;
+  background-color: #FCF3DF;
   padding: 3rem 0;
 }
 
@@ -135,7 +142,7 @@ const errors = reactive({
 .form-container {
   max-width: 600px;
   margin: 0 auto;
-  background-color: #FCF3DF;
+  background-color: white;
   border-radius: 12px;
   padding: 2rem;
 }
@@ -184,7 +191,7 @@ const errors = reactive({
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: white;
+  color: #FCF3DF;
   transition: color 0.2s;
 }
 
