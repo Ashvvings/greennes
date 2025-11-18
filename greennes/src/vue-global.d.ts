@@ -134,10 +134,3 @@ export {};
 	function __VLS_asFunctionalSlot<S>(slot: S): S extends () => infer R ? (props: {}) => R : NonNullable<S>;
 	function __VLS_tryAsConstant<const T>(t: T): T;
 }
-
-	// Basic module shim for single-file components so TypeScript can import .vue files
-	declare module '*.vue' {
-		import type { DefineComponent } from 'vue'
-		const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, any>
-		export default component
-	}
