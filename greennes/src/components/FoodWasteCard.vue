@@ -95,9 +95,16 @@ onMounted(async () => {
       <div v-if="loading" class="loading">Chargement...</div>
       <div v-else-if="sortedWasteData.length" class="items-list">
         <div v-for="(item, idx) in sortedWasteData" :key="idx" class="item">
-          <div class="item-header"><h4>{{ item.name }}</h4></div>
-          <p class="item-detail"><span class="distance">{{ item.formattedDistance }}</span></p>
-        </div>
+          <div class="item-main">
+            <div class="item-left">
+              <div class="item-header"><h4>{{ item.name }}</h4></div>
+          </div>
+       <div class="item-distance">
+      <span class="distance">{{ item.formattedDistance }}</span>
+    </div>
+  </div>
+</div>
+
       </div>
     </div>
     <button @click="$emit('show-map')" class="btn-more">Voir plus</button>
@@ -183,10 +190,36 @@ onMounted(async () => {
   color: #666;
 }
 
+.item-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.item-left {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.item-distance {
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  padding-left: 1rem;
+}
+
 .distance {
   color: #0EA5A4;
   font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
 }
+
 
 .btn-more {
   background-color: #D4AF8F;

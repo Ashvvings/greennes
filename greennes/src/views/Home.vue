@@ -6,6 +6,7 @@
     <!-- Main Content Section -->
     <section v-if="selectedLocation" class="main-content" id="home-cards">
       <div class="container">
+        <h2>Infrastructures</h2>
         <div class="cards-grid">
           <BikeCard :location="selectedLocation" @show-map="showBikeMap" />
           <FoodWasteCard :location="selectedLocation" @show-map="showWasteMap" />
@@ -86,6 +87,15 @@ const closeMapModal = () => {
 
 <style scoped>
 
+h2 {
+  text-align: center;
+  color: #2d3748;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  margin-top:0
+}
+
 .home-view {
   width: 100%;
   margin-top: 3rem;
@@ -108,24 +118,15 @@ const closeMapModal = () => {
 .cards-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: 1fr 1fr 2fr;
-  grid-template-areas: 
-    "bike food park";
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+      "bike food"
+      "park park";
 }
 
 .cards-grid > :nth-child(1) { grid-area: bike; }
 .cards-grid > :nth-child(2) { grid-area: food; }
 .cards-grid > :nth-child(3) { grid-area: park; }
-
-/* ---- TABLET (2 lignes) ---- */
-@media (max-width: 1024px) {
-  .cards-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "bike food"
-      "park park";
-  }
-}
 
 /* ---- MOBILE ---- */
 @media (max-width: 768px) {
