@@ -26,6 +26,7 @@
               v-for="(park, index) in displayedParks" 
               :key="index"
               class="carousel-card"
+              @click="openMapOnPark(park)"
             >
               <img 
                 :src="park.image" 
@@ -62,7 +63,7 @@
       </div>
     </div>
 
-    <button @click="$emit('show-map')" class="btn-more">Voir plus</button>
+    <button @click="openMapGeneral" class="btn-more">Voir plus</button>
   </div>
 </template>
 
@@ -87,7 +88,9 @@ const props = defineProps<{
   location: Location
 }>()
 
-const emit = defineEmits(['show-map'])
+const emit = defineEmits<{
+  (e: 'show-map', data: { centerOn?: { lat: number; lon: number; name: string } }): void
+}>()
 
 // Liste complète des parcs rennais
 const allParks = ref<Park[]>([
@@ -147,6 +150,22 @@ const displayedParks = computed(() => {
     .sort((a, b) => a.distance! - b.distance!)
     .slice(0, 5)
 })
+
+// Ouvrir la carte centrée sur un parc spécifique
+const openMapOnPark = (park: Park) => {
+  emit('show-map', {
+    centerOn: {
+      lat: park.lat,
+      lon: park.lon,
+      name: park.name
+    }
+  })
+}
+
+// Ouvrir la carte centrée sur la position de l'utilisateur
+const openMapGeneral = () => {
+  emit('show-map', {})
+}
 
 const updateScrollButtons = () => {
   if (!carouselContainer.value) return
@@ -267,6 +286,12 @@ onUnmounted(() => {
   scroll-snap-align: start;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.carousel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 .carousel-card img {
