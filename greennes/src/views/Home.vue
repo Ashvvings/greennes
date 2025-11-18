@@ -15,10 +15,10 @@
     </section>
 
     <!-- Air Quality Section -->
-    <AirQualitySection />
+    <AirQualitySection id="air-quality" />
 
     <!-- Rating Form Section -->
-    <RatingForm />
+    <RatingForm id="comment" />
 
     <!-- Map Modal -->
     <MapModal
