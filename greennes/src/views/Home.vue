@@ -103,7 +103,7 @@ h2 {
 
 .main-content {
   background-color: #FCF3DF;
-  padding: 2rem 0;
+  padding:0 0 2rem 0;
 }
 
 .container {
