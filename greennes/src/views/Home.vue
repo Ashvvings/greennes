@@ -1,7 +1,7 @@
 <template>
   <div class="home-view">
     <!-- Search Bar -->
-    <SearchBar @location-selected="handleLocationSelected" />
+    <SearchBar :location="selectedLocation ?? defaultLocation" @location-selected="handleLocationSelected" />
 
     <!-- Main Content Section -->
     <section v-if="selectedLocation" class="main-content" id="home-cards">
@@ -46,6 +46,14 @@ const props = defineProps<{
 }>()
 
 const selectedLocation = ref<Location | null>(null)
+
+// default location object to satisfy SearchBar's required prop typing before a real selection is made
+const defaultLocation: Location = {
+  name: '',
+  lat: 0,
+  lon: 0
+}
+
 const showMap = ref(false)
 const mapTitle = ref('')
 const mapItems = ref([])
