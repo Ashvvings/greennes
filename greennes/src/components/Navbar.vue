@@ -150,7 +150,7 @@ watch(() => route.path, () => {
 }
 
 .nav-link:hover {
-  color: #d4af8f;
+  color: #0EA5A4;
 }
 
 /* Indicateur actif - barre noire en dessous */
