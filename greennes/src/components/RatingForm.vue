@@ -103,7 +103,6 @@ const errors = reactive({
 h2 {
   text-align: center;
   color: #2d3748;
-  font-size: 2.5rem;
   margin-bottom: 2rem;
   font-weight: 600;
 }
@@ -123,13 +122,6 @@ h2 {
   color: #D32F2F;
   font-size: 0.85rem;
   margin-top: 0.25rem;
-}
-
-.rating-section h2 {
-  text-align: center;
-  color: #1B0808;
-  font-size: 2rem;
-  margin-bottom: 1rem;
 }
 
 .form-intro {

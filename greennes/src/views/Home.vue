@@ -1,5 +1,8 @@
 <template>
   <div class="home-view">
+    <!-- Intro Section -->
+    <IntroSection id="intro" />
+
     <!-- Search Bar -->
     <SearchBar :location="selectedLocation ?? defaultLocation" @location-selected="handleLocationSelected" />
 
@@ -33,6 +36,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import IntroSection from '../components/IntroSection.vue'
 import SearchBar from '../components/SearchBar.vue'
 import BikeCard from '../components/BikeCard.vue'
 import FoodWasteCard from '../components/FoodWasteCard.vue'
@@ -90,7 +94,6 @@ const closeMapModal = () => {
 h2 {
   text-align: center;
   color: #2d3748;
-  font-size: 2.5rem;
   margin-bottom: 2rem;
   font-weight: 600;
   margin-top:0
@@ -103,7 +106,7 @@ h2 {
 
 .main-content {
   background-color: #FCF3DF;
-  padding:0 0 2rem 0;
+  padding:4rem 0 2rem 0;
 }
 
 .container {

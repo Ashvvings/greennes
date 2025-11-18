@@ -234,8 +234,8 @@ const selectFromList = (label: string) => {
   color: #000;
 }
 .search-section {
-  background-color: #FCF3DF;
-  padding: 1.5rem 0;
+  background-color: white;
+  padding: 1.5rem 0 0.5rem 0;
 }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
 .search-container { display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap; }
